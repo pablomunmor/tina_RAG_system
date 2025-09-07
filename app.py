@@ -9,9 +9,16 @@ from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
 # Provider-specific imports
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.llms import HuggingFaceHub
+from langchain_huggingface import HuggingFaceEndpoint, HuggingFaceEmbeddings
 from langchain_openai import OpenAIEmbeddings, OpenAI
+
+# --- Config ---
+# Import keys from our new config.py file
+try:
+    from config import HUGGING_FACE_HUB_API_TOKEN, OPENAI_API_KEY
+except ImportError:
+    HUGGING_FACE_HUB_API_TOKEN = None
+    OPENAI_API_KEY = None
 
 # --- Constants ---
 UPLOAD_FOLDER = 'uploaded_files'
@@ -28,26 +35,28 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # --- Helper Functions ---
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def get_llm_and_embeddings(provider: str):
     """Returns the appropriate LLM and embeddings based on the provider."""
     if provider == 'openai':
-        if "OPENAI_API_KEY" not in os.environ:
-            raise ValueError("OPENAI_API_KEY not set for 'openai' provider.")
-        embeddings = OpenAIEmbeddings()
-        llm = OpenAI(temperature=0.2)
+        if not OPENAI_API_KEY:
+            raise ValueError("OPENAI_API_KEY not set in config.py for 'openai' provider.")
+        embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+        llm = OpenAI(temperature=0.2, openai_api_key=OPENAI_API_KEY)
         return llm, embeddings
     elif provider == 'local':
-        if "HUGGINGFACEHUB_API_TOKEN" not in os.environ:
-            raise ValueError("HUGGINGFACEHUB_API_TOKEN not set for 'local' provider.")
+        if not HUGGING_FACE_HUB_API_TOKEN:
+            raise ValueError("HUGGINGFACEHUB_API_TOKEN not set in config.py for 'local' provider.")
         # Using a popular open-source model for embeddings
         embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
         # Using a popular open-source model for generation from the Hub
-        llm = HuggingFaceHub(
+        llm = HuggingFaceEndpoint(
             repo_id="google/flan-t5-large",
-            model_kwargs={"temperature": 0.5, "max_length": 512}
+            task="text2text-generation",
+            huggingfacehub_api_token=HUGGING_FACE_HUB_API_TOKEN,
+            temperature=0.5,
+            max_new_tokens=512
         )
         return llm, embeddings
     else:
@@ -106,7 +115,8 @@ def ask_question(query: str, provider: str = 'local'):
         return_source_documents=True
     )
 
-    result = qa_chain({"query": query})
+    # The .invoke method for this chain expects the query string directly.
+    result = qa_chain.invoke(query)
     answer = result.get("result", "Sorry, I could not find an answer.")
     sources = [doc.metadata.get('source', 'N/A') for doc in result.get("source_documents", [])]
     

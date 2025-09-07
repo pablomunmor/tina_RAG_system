@@ -1,3 +1,5 @@
+Flask
+Werkzeug
 langchain
 langchain-community
 openai
@@ -8,3 +10,5 @@ tiktoken
 sentence-transformers
 torch
 transformers
+langchain-openai
+langchain-huggingface
