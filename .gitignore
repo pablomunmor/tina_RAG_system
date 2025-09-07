@@ -43,6 +43,12 @@ uploaded_files/
 *.faiss
 *.pkl
 
+# Conversation Logs and Analytics (SENSITIVE DATA)
+conversation_logs/
+analytics_report_*.json
+feedback_*.jsonl
+conversations_*.jsonl
+
 # Logs
 *.log
 logs/
@@ -77,3 +83,7 @@ instance/
 # Database
 *.db
 *.sqlite3
+
+# Backup files
+*.bak
+*.backup

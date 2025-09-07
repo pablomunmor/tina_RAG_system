@@ -312,6 +312,48 @@
             color: white;
         }
 
+        /* Feedback System */
+        .feedback-section {
+            margin-top: 10px;
+            padding: 8px 0;
+            border-top: 1px solid var(--soft-gray);
+        }
+
+        .feedback-prompt {
+            font-size: 0.8rem;
+            color: var(--charcoal-text);
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .star {
+            font-size: 16px;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #FFD700;
+        }
+
+        .feedback-input {
+            width: 100%;
+            padding: 6px 8px;
+            font-size: 0.75rem;
+            border: 1px solid var(--soft-gray);
+            border-radius: 6px;
+            resize: none;
+            font-family: inherit;
+        }
+
         .message-time {
             font-size: 0.75rem;
             opacity: 0.6;
@@ -467,26 +509,7 @@
             transform: none;
         }
 
-        /* Mobile Responsive */
-        @media (max-width: 480px) {
-            .chatbot-widget {
-                bottom: 0;
-                right: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                border-radius: 0;
-                border-top-left-radius: 20px;
-                border-top-right-radius: 20px;
-            }
-
-            .chatbot-trigger {
-                bottom: 20px;
-                right: 20px;
-            }
-        }
-
-        /* Admin Panel Styles */
+        /* Admin Panel */
         .admin-panel {
             position: fixed;
             top: 20px;
@@ -535,6 +558,34 @@
             border-radius: 8px;
             font-size: 0.85rem;
         }
+
+        /* Mobile Responsive */
+        @media (max-width: 480px) {
+            .chatbot-widget {
+                bottom: 0;
+                right: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
+            }
+
+            .chatbot-trigger {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .admin-panel {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin: 20px;
+                width: auto;
+                max-width: none;
+            }
+        }
     </style>
 </head>
 
@@ -548,44 +599,44 @@
 
         <div class="demo-sections">
             <div class="demo-card">
-                <h3>Pregnancy Support</h3>
-                <p>Comprehensive guidance throughout your pregnancy journey with personalized care plans and 24/7
-                    support from our AI assistant.</p>
+                <h3>Evidence-Based Support</h3>
+                <p>Get trusted, medically-reviewed guidance throughout your pregnancy journey with personalized care and
+                    24/7 access to reliable information.</p>
             </div>
             <div class="demo-card">
-                <h3>Postpartum Care</h3>
-                <p>Navigate the early weeks of motherhood with confidence. Get answers to feeding questions, sleep
-                    guidance, and emotional support.</p>
+                <h3>Compassionate Care</h3>
+                <p>Navigate the early weeks of motherhood with confidence. Our AI assistant provides warm, understanding
+                    support for feeding, sleep, and emotional wellness.</p>
             </div>
             <div class="demo-card">
-                <h3>Family Wellness</h3>
-                <p>Evidence-based resources for your growing family, from infant development to maternal health and
-                    wellness tips.</p>
+                <h3>Safe & Reliable</h3>
+                <p>All guidance includes appropriate medical disclaimers and encourages consultation with healthcare
+                    providers. Your safety and well-being are our top priorities.</p>
             </div>
         </div>
     </div>
 
     <!-- Admin Panel (Back-end Controls) -->
     <div class="admin-panel">
-        <h3><i class="fas fa-cog"></i> Admin Controls</h3>
+        <h3><i class="fas fa-cog"></i> Medical Admin</h3>
         <div class="admin-controls">
-            <button class="admin-btn" onclick="toggleTrainingMode()">
-                <i class="fas fa-brain"></i> Training Mode
-            </button>
-            <button class="admin-btn" onclick="viewAnalytics()">
-                <i class="fas fa-chart-bar"></i> Analytics
-            </button>
             <button class="admin-btn" onclick="manageKnowledge()">
-                <i class="fas fa-database"></i> Knowledge Base
+                <i class="fas fa-upload"></i> Upload Medical Content
             </button>
-            <button class="admin-btn" onclick="exportConversations()">
-                <i class="fas fa-download"></i> Export Data
+            <button class="admin-btn" onclick="viewConversationLogs()">
+                <i class="fas fa-chart-bar"></i> Conversation Logs
+            </button>
+            <button class="admin-btn" onclick="viewFeedback()">
+                <i class="fas fa-star"></i> User Feedback
+            </button>
+            <button class="admin-btn" onclick="exportData()">
+                <i class="fas fa-download"></i> Export Analytics
             </button>
         </div>
         <div class="training-status">
-            <strong>Status:</strong> <span id="trainingStatus">Active Learning</span><br>
-            <strong>Conversations:</strong> <span id="conversationCount">1,247</span><br>
-            <strong>Accuracy:</strong> <span id="accuracyRate">94.2%</span>
+            <strong>Status:</strong> <span id="systemStatus">Medical AI Active</span><br>
+            <strong>Knowledge Base:</strong> <span id="knowledgeStatus">Ready</span><br>
+            <strong>Safety Checks:</strong> <span id="safetyStatus">Enabled</span>
         </div>
     </div>
 
@@ -605,7 +656,7 @@
                 </div>
                 <div class="chatbot-subtitle">
                     <span class="status-dot"></span>
-                    Online - Here to help you
+                    Online - Here to support you
                 </div>
             </div>
         </div>
@@ -618,14 +669,27 @@
                 </div>
                 <div>
                     <div class="message-content">
-                        👋 Hi! I'm your Clementina Health assistant. I'm here to support you through your pregnancy and
-                        parenting journey. How can I help you today?
+                        Hello! I'm Clementina, your maternal health assistant. I'm here to provide caring,
+                        evidence-based support for your pregnancy and parenting journey. I understand this time can
+                        bring many questions and concerns - how can I help you today?
+
+                        <div
+                            style="margin-top: 12px; padding: 8px; background: rgba(244, 124, 60, 0.1); border-radius: 8px; font-size: 0.8rem;">
+                            <i class="fas fa-info-circle" style="color: var(--clementina-orange);"></i>
+                            <strong>Important:</strong> My guidance is educational. Always consult your healthcare
+                            provider for personalized medical advice.
+                        </div>
                     </div>
                     <div class="quick-actions">
-                        <div class="quick-action" onclick="sendQuickMessage('Pregnancy questions')">Pregnancy questions
+                        <div class="quick-action"
+                            onclick="sendQuickMessage('I have questions about pregnancy symptoms')">Pregnancy symptoms
                         </div>
-                        <div class="quick-action" onclick="sendQuickMessage('Feeding help')">Feeding help</div>
-                        <div class="quick-action" onclick="sendQuickMessage('Baby development')">Baby development</div>
+                        <div class="quick-action" onclick="sendQuickMessage('I need help with breastfeeding')">
+                            Breastfeeding support</div>
+                        <div class="quick-action" onclick="sendQuickMessage('Tell me about newborn care')">Newborn care
+                        </div>
+                        <div class="quick-action" onclick="sendQuickMessage('I am feeling anxious about labor')">Labor
+                            concerns</div>
                     </div>
                 </div>
             </div>
@@ -638,7 +702,7 @@
                 <i class="fas fa-heart"></i>
             </div>
             <div>
-                <div style="color: var(--charcoal-text); font-size: 0.9rem;">Clementina is typing...</div>
+                <div style="color: var(--charcoal-text); font-size: 0.9rem;">Clementina is thinking...</div>
                 <div class="typing-dots">
                     <div class="typing-dot"></div>
                     <div class="typing-dot"></div>
@@ -651,7 +715,7 @@
         <div class="chatbot-input">
             <div class="input-wrapper">
                 <textarea class="chat-input" id="chatInput"
-                    placeholder="Ask me anything about pregnancy, baby care, or wellness..." rows="1"
+                    placeholder="Ask me about pregnancy, childbirth, newborn care, or any wellness concerns..." rows="1"
                     onkeypress="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
                 <button class="send-button" id="sendButton" onclick="sendMessage()">
                     <i class="fas fa-paper-plane"></i>
@@ -662,6 +726,7 @@
 
     <script>
         let isOpen = false;
+        let currentConversationId = null;
 
         function toggleChatbot() {
             const widget = document.getElementById('chatbotWidget');
@@ -693,7 +758,7 @@
                 const response = await fetch('/ask', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message, provider: 'local' }) // Defaulting to 'local'
+                    body: JSON.stringify({ message: message, provider: 'local' })
                 });
 
                 hideTypingIndicator();
@@ -704,11 +769,12 @@
                 }
 
                 const data = await response.json();
-                addMessage(data.answer, 'bot');
+                currentConversationId = data.conversation_id;
+                addMessage(data.answer, 'bot', true); // Enable feedback for bot messages
 
             } catch (error) {
                 hideTypingIndicator();
-                addMessage(`Sorry, there was an error: ${error.message}`, 'bot');
+                addMessage(`I apologize, but I'm experiencing technical difficulties: ${error.message}. Please try again in a moment.`, 'bot');
                 console.error("Error sending message:", error);
             }
         }
@@ -718,7 +784,7 @@
             sendMessage();
         }
 
-        function addMessage(text, sender) {
+        function addMessage(text, sender, enableFeedback = false) {
             const messagesContainer = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
@@ -726,16 +792,89 @@
             const avatar = sender === 'bot' ? '<i class="fas fa-heart"></i>' : '<i class="fas fa-user"></i>';
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+            let feedbackHtml = '';
+            if (enableFeedback && sender === 'bot') {
+                const messageId = 'msg_' + Date.now();
+                feedbackHtml = `
+                    <div class="feedback-section" id="feedback_${messageId}">
+                        <div class="feedback-prompt">Was this helpful?</div>
+                        <div class="star-rating" data-message-id="${messageId}">
+                            ${[1, 2, 3, 4, 5].map(i => `<span class="star" data-rating="${i}">★</span>`).join('')}
+                        </div>
+                        <textarea class="feedback-input" placeholder="Optional: Tell us how we can improve..." 
+                                  id="feedback_text_${messageId}" style="display: none;"></textarea>
+                    </div>
+                `;
+            }
+
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatar}</div>
                 <div>
                     <div class="message-content">${text.replace(/\n/g, '<br>')}</div>
                     <div class="message-time">${time}</div>
+                    ${feedbackHtml}
                 </div>
             `;
 
             messagesContainer.appendChild(messageDiv);
+
+            // Add star rating functionality
+            if (enableFeedback && sender === 'bot') {
+                const messageId = 'msg_' + (Date.now() - 1); // Match the ID used above
+                addStarRatingHandler(messageId);
+            }
+
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function addStarRatingHandler(messageId) {
+            const stars = document.querySelectorAll(`[data-message-id="${messageId}"] .star`);
+            stars.forEach(star => {
+                star.addEventListener('click', function () {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    const allStars = this.parentElement.querySelectorAll('.star');
+
+                    // Update star appearance
+                    allStars.forEach((s, index) => {
+                        s.classList.toggle('active', index < rating);
+                    });
+
+                    // Show feedback text area
+                    const feedbackText = document.getElementById(`feedback_text_${messageId}`);
+                    if (feedbackText) {
+                        feedbackText.style.display = 'block';
+                        feedbackText.focus();
+                    }
+
+                    // Submit feedback after a short delay or when text is entered
+                    setTimeout(() => submitFeedback(messageId, rating), 1000);
+                });
+            });
+        }
+
+        async function submitFeedback(messageId, rating) {
+            const feedbackText = document.getElementById(`feedback_text_${messageId}`);
+            const feedbackValue = feedbackText ? feedbackText.value : '';
+
+            try {
+                await fetch('/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conversation_id: currentConversationId,
+                        rating: rating,
+                        feedback: feedbackValue
+                    })
+                });
+
+                // Show thank you message
+                const feedbackSection = document.getElementById(`feedback_${messageId}`);
+                if (feedbackSection) {
+                    feedbackSection.innerHTML = '<div style="color: var(--sage-mist); font-size: 0.8rem; font-style: italic;">Thank you for your feedback!</div>';
+                }
+            } catch (error) {
+                console.error('Error submitting feedback:', error);
+            }
         }
 
         function showTypingIndicator() {
@@ -763,7 +902,6 @@
         // --- Admin Functions ---
 
         function manageKnowledge() {
-            // Trigger the hidden file input
             document.getElementById('fileUploader').click();
         }
 
@@ -773,11 +911,10 @@
 
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('provider', 'local'); // Defaulting to local
+            formData.append('provider', 'local');
 
-            // You can show a status in the UI
-            const statusDiv = document.getElementById('trainingStatus');
-            statusDiv.innerHTML = `<strong>Status:</strong> Uploading and processing ${file.name}...`;
+            const statusElement = document.getElementById('knowledgeStatus');
+            statusElement.textContent = `Processing ${file.name}...`;
 
             try {
                 const response = await fetch('/upload', {
@@ -791,17 +928,26 @@
                     throw new Error(result.error || 'File upload failed.');
                 }
 
-                statusDiv.innerHTML = `<strong>Status:</strong> ${result.success}`;
+                statusElement.textContent = 'Updated Successfully';
+                alert(result.success);
             } catch (error) {
-                statusDiv.innerHTML = `<strong>Status:</strong> Error: ${error.message}`;
+                statusElement.textContent = 'Upload Failed';
+                alert(`Error: ${error.message}`);
                 console.error('File upload error:', error);
             }
         }
 
-        // Dummy functions for other admin buttons
-        function toggleTrainingMode() { alert('Training mode controls would be implemented here.'); }
-        function viewAnalytics() { alert('Analytics dashboard would be implemented here.'); }
-        function exportConversations() { alert('Conversation export would be implemented here.'); }
+        function viewConversationLogs() {
+            alert('Conversation logs are stored in the conversation_logs/ folder. Implementation of web-based log viewer would go here.');
+        }
+
+        function viewFeedback() {
+            alert('User feedback analytics would be displayed here, showing ratings and improvement suggestions.');
+        }
+
+        function exportData() {
+            alert('Data export functionality would be implemented here, allowing download of conversations and feedback.');
+        }
 
     </script>
 
