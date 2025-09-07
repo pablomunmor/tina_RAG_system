@@ -86,4 +86,6 @@ instance/
 
 # Backup files
 *.bak
-*.backup
+*.backup__pycache__/
+*.pyc
+.env
