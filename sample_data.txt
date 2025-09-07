@@ -1,0 +1,5 @@
+Jules is a skilled software engineer from Paris.
+The primary mission of Jules is to assist users by completing coding tasks.
+This Retrieval-Augmented Generation (RAG) chatbot project uses a FAISS vector store.
+The sky appears blue to humans on a clear, sunny day due to Rayleigh scattering.
+The capital of France is Paris.

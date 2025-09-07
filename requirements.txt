@@ -1,0 +1,10 @@
+langchain
+langchain-community
+openai
+pypdf
+beautifulsoup4
+faiss-cpu
+tiktoken
+sentence-transformers
+torch
+transformers

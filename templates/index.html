@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clementina Health - AI Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman:wght@400;500;600&family=Courier+Prime:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --clementina-orange: #F47C3C;
+            --peach-glow: #FFB88C;
+            --calm-cream: #FFF6F0;
+            --sage-mist: #A8C7A2;
+            --lavender-light: #DCCEF8;
+            --charcoal-text: #2E2E2E;
+            --soft-gray: #F3F3F3;
+            --warm-brown: #A24206;
+            --coral: #F26A32;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background: linear-gradient(135deg, var(--calm-cream), #fff);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Demo Page Content */
+        .demo-content {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            color: var(--charcoal-text);
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .demo-header h1 {
+            color: var(--warm-brown);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .demo-header p {
+            font-size: 1.1rem;
+            color: var(--charcoal-text);
+            opacity: 0.8;
+        }
+
+        .demo-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .demo-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--clementina-orange);
+        }
+
+        .demo-card h3 {
+            color: var(--warm-brown);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .demo-card p {
+            line-height: 1.6;
+            color: var(--charcoal-text);
+        }
+
+        /* Chatbot Trigger Button */
+        .chatbot-trigger {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--clementina-orange), var(--coral));
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(244, 124, 60, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+
+        .chatbot-trigger:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(244, 124, 60, 0.4);
+        }
+
+        .chatbot-trigger i {
+            color: white;
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .chatbot-trigger.active i {
+            transform: rotate(45deg);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 8px 25px rgba(244, 124, 60, 0.3); }
+            50% { box-shadow: 0 8px 25px rgba(244, 124, 60, 0.5), 0 0 0 10px rgba(244, 124, 60, 0.1); }
+            100% { box-shadow: 0 8px 25px rgba(244, 124, 60, 0.3); }
+        }
+
+        /* Chatbot Widget */
+        .chatbot-widget {
+            position: fixed;
+            bottom: 110px;
+            right: 30px;
+            width: 380px;
+            height: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 999;
+        }
+
+        .chatbot-widget.open {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Chatbot Header */
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--clementina-orange), var(--coral));
+            padding: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chatbot-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .chatbot-header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .chatbot-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chatbot-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Chat Messages Area */
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: linear-gradient(to bottom, #fafafa, white);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-track {
+            background: var(--soft-gray);
+        }
+
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: var(--sage-mist);
+            border-radius: 3px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            max-width: 85%;
+            animation: messageSlide 0.3s ease-out;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, var(--clementina-orange), var(--coral));
+            color: white;
+        }
+
+        .message.user .message-avatar {
+            background: var(--sage-mist);
+            color: white;
+        }
+
+        .message-content {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            border: 1px solid var(--soft-gray);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--clementina-orange), var(--coral));
+            color: white;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 15px 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .typing-indicator.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--clementina-orange);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .quick-action {
+            background: var(--calm-cream);
+            border: 1px solid var(--peach-glow);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--charcoal-text);
+        }
+
+        .quick-action:hover {
+            background: var(--peach-glow);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Chat Input */
+        .chatbot-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid var(--soft-gray);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            background: var(--soft-gray);
+            border-radius: 25px;
+            padding: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-family: 'Times New Roman', serif;
+            color: var(--charcoal-text);
+            resize: none;
+            max-height: 100px;
+            min-height: 20px;
+            outline: none;
+        }
+
+        .chat-input::placeholder {
+            color: #999;
+        }
+
+        .send-button {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--clementina-orange), var(--coral));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .send-button:hover {
+            transform: scale(1.1);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 480px) {
+            .chatbot-widget {
+                bottom: 0;
+                right: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
+            }
+
+            .chatbot-trigger {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+
+        /* Admin Panel Styles */
+        .admin-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            max-width: 300px;
+            z-index: 998;
+        }
+
+        .admin-panel h3 {
+            color: var(--warm-brown);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .admin-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .admin-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--clementina-orange);
+            background: transparent;
+            color: var(--clementina-orange);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .admin-btn:hover, .admin-btn.active {
+            background: var(--clementina-orange);
+            color: white;
+        }
+
+        .training-status {
+            margin-top: 15px;
+            padding: 10px;
+            background: var(--calm-cream);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Content -->
+    <div class="demo-content">
+        <div class="demo-header">
+            <h1>Clementina Health</h1>
+            <p>Your trusted partner in maternal and family wellness</p>
+        </div>
+
+        <div class="demo-sections">
+            <div class="demo-card">
+                <h3>Pregnancy Support</h3>
+                <p>Comprehensive guidance throughout your pregnancy journey with personalized care plans and 24/7 support from our AI assistant.</p>
+            </div>
+            <div class="demo-card">
+                <h3>Postpartum Care</h3>
+                <p>Navigate the early weeks of motherhood with confidence. Get answers to feeding questions, sleep guidance, and emotional support.</p>
+            </div>
+            <div class="demo-card">
+                <h3>Family Wellness</h3>
+                <p>Evidence-based resources for your growing family, from infant development to maternal health and wellness tips.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel (Back-end Controls) -->
+    <div class="admin-panel">
+        <h3><i class="fas fa-cog"></i> Admin Controls</h3>
+        <div class="admin-controls">
+            <button class="admin-btn" onclick="toggleTrainingMode()">
+                <i class="fas fa-brain"></i> Training Mode
+            </button>
+            <button class="admin-btn" onclick="viewAnalytics()">
+                <i class="fas fa-chart-bar"></i> Analytics
+            </button>
+            <button class="admin-btn" onclick="manageKnowledge()">
+                <i class="fas fa-database"></i> Knowledge Base
+            </button>
+            <button class="admin-btn" onclick="exportConversations()">
+                <i class="fas fa-download"></i> Export Data
+            </button>
+        </div>
+        <div class="training-status">
+            <strong>Status:</strong> <span id="trainingStatus">Active Learning</span><br>
+            <strong>Conversations:</strong> <span id="conversationCount">1,247</span><br>
+            <strong>Accuracy:</strong> <span id="accuracyRate">94.2%</span>
+        </div>
+    </div>
+
+    <!-- Chatbot Trigger Button -->
+    <button class="chatbot-trigger" onclick="toggleChatbot()">
+        <i class="fas fa-comment-medical"></i>
+    </button>
+
+    <!-- Chatbot Widget -->
+    <div class="chatbot-widget" id="chatbotWidget">
+        <!-- Header -->
+        <div class="chatbot-header">
+            <div class="chatbot-header-content">
+                <div class="chatbot-title">
+                    <i class="fas fa-heart"></i>
+                    Clementina Assistant
+                </div>
+                <div class="chatbot-subtitle">
+                    <span class="status-dot"></span>
+                    Online - Here to help you
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="message-avatar">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div>
+                    <div class="message-content">
+                        👋 Hi! I'm your Clementina Health assistant. I'm here to support you through your pregnancy and parenting journey. How can I help you today?
+                    </div>
+                    <div class="quick-actions">
+                        <div class="quick-action" onclick="sendQuickMessage('Pregnancy questions')">Pregnancy questions</div>
+                        <div class="quick-action" onclick="sendQuickMessage('Feeding help')">Feeding help</div>
+                        <div class="quick-action" onclick="sendQuickMessage('Baby development')">Baby development</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="message-avatar" style="background: linear-gradient(135deg, var(--clementina-orange), var(--coral)); color: white;">
+                <i class="fas fa-heart"></i>
+            </div>
+            <div>
+                <div style="color: var(--charcoal-text); font-size: 0.9rem;">Clementina is typing...</div>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="chatbot-input">
+            <div class="input-wrapper">
+                <textarea 
+                    class="chat-input" 
+                    id="chatInput" 
+                    placeholder="Ask me anything about pregnancy, baby care, or wellness..."
+                    rows="1"
+                    onkeypress="handleKeyPress(event)"
+                    oninput="autoResize(this)"
+                ></textarea>
+                <button class="send-button" id="sendButton" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isOpen = false;
+
+        function toggleChatbot() {
+            const widget = document.getElementById('chatbotWidget');
+            const trigger = document.querySelector('.chatbot-trigger');
+            
+            isOpen = !isOpen;
+            
+            if (isOpen) {
+                widget.classList.add('open');
+                trigger.classList.add('active');
+                setTimeout(() => document.getElementById('chatInput').focus(), 300);
+            } else {
+                widget.classList.remove('open');
+                trigger.classList.remove('active');
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage(message, 'user');
+            input.value = '';
+            autoResize(input);
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message, provider: 'local' }) // Defaulting to 'local'
+                });
+
+                hideTypingIndicator();
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error || 'An unknown error occurred.');
+                }
+
+                const data = await response.json();
+                addMessage(data.answer, 'bot');
+
+            } catch (error) {
+                hideTypingIndicator();
+                addMessage(`Sorry, there was an error: ${error.message}`, 'bot');
+                console.error("Error sending message:", error);
+            }
+        }
+
+        function sendQuickMessage(message) {
+            document.getElementById('chatInput').value = message;
+            sendMessage();
+        }
+
+        function addMessage(text, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = sender === 'bot' ? '<i class="fas fa-heart"></i>' : '<i class="fas fa-user"></i>';
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatar}</div>
+                <div>
+                    <div class="message-content">${text.replace(/\n/g, '<br>')}</div>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').classList.add('show');
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').classList.remove('show');
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+        }
+
+        // --- Admin Functions ---
+
+        function manageKnowledge() {
+            // Trigger the hidden file input
+            document.getElementById('fileUploader').click();
+        }
+        
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('provider', 'local'); // Defaulting to local
+
+            // You can show a status in the UI
+            const statusDiv = document.getElementById('trainingStatus');
+            statusDiv.innerHTML = `<strong>Status:</strong> Uploading and processing ${file.name}...`;
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'File upload failed.');
+                }
+
+                statusDiv.innerHTML = `<strong>Status:</strong> ${result.success}`;
+            } catch (error) {
+                statusDiv.innerHTML = `<strong>Status:</strong> Error: ${error.message}`;
+                console.error('File upload error:', error);
+            }
+        }
+        
+        // Dummy functions for other admin buttons
+        function toggleTrainingMode() { alert('Training mode controls would be implemented here.'); }
+        function viewAnalytics() { alert('Analytics dashboard would be implemented here.'); }
+        function exportConversations() { alert('Conversation export would be implemented here.'); }
+
+    </script>
+    
+    <!-- Hidden file input for knowledge base uploads -->
+    <input type="file" id="fileUploader" style="display: none;" onchange="handleFileUpload(event)" accept=".txt,.pdf">
+</body>
+</html>
