@@ -12,3 +12,4 @@ torch
 transformers
 langchain-openai
 langchain-huggingface
+accelerate

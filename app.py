@@ -9,13 +9,14 @@ from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
 # Provider-specific imports
-from langchain_huggingface import HuggingFaceEndpoint, HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFacePipeline, HuggingFaceEmbeddings
 from langchain_openai import OpenAIEmbeddings, OpenAI
 
-# --- Config ---
-# Import keys from our new config.py file
+# --- Secrets ---
+# For simplicity, we'll import the key from a local file.
+# This makes it easier for the user than setting environment variables.
 try:
-    from config import HUGGING_FACE_HUB_API_TOKEN, OPENAI_API_KEY
+    from secrets import HUGGING_FACE_HUB_API_TOKEN, OPENAI_API_KEY
 except ImportError:
     HUGGING_FACE_HUB_API_TOKEN = None
     OPENAI_API_KEY = None
@@ -35,28 +36,28 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # --- Helper Functions ---
 def allowed_file(filename):
-    return '.' in filename and            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def get_llm_and_embeddings(provider: str):
     """Returns the appropriate LLM and embeddings based on the provider."""
     if provider == 'openai':
         if not OPENAI_API_KEY:
-            raise ValueError("OPENAI_API_KEY not set in config.py for 'openai' provider.")
+            raise ValueError("OPENAI_API_KEY not set in secrets.py for 'openai' provider.")
         embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
         llm = OpenAI(temperature=0.2, openai_api_key=OPENAI_API_KEY)
         return llm, embeddings
     elif provider == 'local':
         if not HUGGING_FACE_HUB_API_TOKEN:
-            raise ValueError("HUGGINGFACEHUB_API_TOKEN not set in config.py for 'local' provider.")
+            raise ValueError("HUGGINGFACEHUB_API_TOKEN not set in secrets.py for 'local' provider.")
         # Using a popular open-source model for embeddings
         embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
         # Using a popular open-source model for generation from the Hub
-        llm = HuggingFaceEndpoint(
-            repo_id="google/flan-t5-large",
+        # The HuggingFacePipeline is generally more robust for self-hosting
+        llm = HuggingFacePipeline.from_model_id(
+            model_id="google/flan-t5-large",
             task="text2text-generation",
-            huggingfacehub_api_token=HUGGING_FACE_HUB_API_TOKEN,
-            temperature=0.5,
-            max_new_tokens=512
+            pipeline_kwargs={"max_new_tokens": 256},
         )
         return llm, embeddings
     else:

@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clementina Health - AI Assistant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman:wght@400;500;600&family=Courier+Prime:wght@400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Times+New+Roman:wght@400;500;600&family=Courier+Prime:wght@400;600&display=swap"
+        rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -68,7 +71,7 @@
             background: white;
             padding: 30px;
             border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             border-left: 4px solid var(--clementina-orange);
         }
 
@@ -119,9 +122,17 @@
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 8px 25px rgba(244, 124, 60, 0.3); }
-            50% { box-shadow: 0 8px 25px rgba(244, 124, 60, 0.5), 0 0 0 10px rgba(244, 124, 60, 0.1); }
-            100% { box-shadow: 0 8px 25px rgba(244, 124, 60, 0.3); }
+            0% {
+                box-shadow: 0 8px 25px rgba(244, 124, 60, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 8px 25px rgba(244, 124, 60, 0.5), 0 0 0 10px rgba(244, 124, 60, 0.1);
+            }
+
+            100% {
+                box-shadow: 0 8px 25px rgba(244, 124, 60, 0.3);
+            }
         }
 
         /* Chatbot Widget */
@@ -133,7 +144,7 @@
             height: 600px;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -202,13 +213,27 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
 
         /* Chat Messages Area */
@@ -273,7 +298,7 @@
             border-radius: 18px;
             font-size: 0.9rem;
             line-height: 1.5;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             position: relative;
         }
 
@@ -299,6 +324,7 @@
                 opacity: 0;
                 transform: translateY(10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -334,14 +360,23 @@
             animation: typing 1.4s infinite ease-in-out;
         }
 
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
 
         @keyframes typing {
-            0%, 80%, 100% {
+
+            0%,
+            80%,
+            100% {
                 transform: scale(0.8);
                 opacity: 0.5;
             }
+
             40% {
                 transform: scale(1);
                 opacity: 1;
@@ -459,7 +494,7 @@
             background: white;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             max-width: 300px;
             z-index: 998;
         }
@@ -487,7 +522,8 @@
             transition: all 0.2s ease;
         }
 
-        .admin-btn:hover, .admin-btn.active {
+        .admin-btn:hover,
+        .admin-btn.active {
             background: var(--clementina-orange);
             color: white;
         }
@@ -501,6 +537,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Demo Content -->
     <div class="demo-content">
@@ -512,15 +549,18 @@
         <div class="demo-sections">
             <div class="demo-card">
                 <h3>Pregnancy Support</h3>
-                <p>Comprehensive guidance throughout your pregnancy journey with personalized care plans and 24/7 support from our AI assistant.</p>
+                <p>Comprehensive guidance throughout your pregnancy journey with personalized care plans and 24/7
+                    support from our AI assistant.</p>
             </div>
             <div class="demo-card">
                 <h3>Postpartum Care</h3>
-                <p>Navigate the early weeks of motherhood with confidence. Get answers to feeding questions, sleep guidance, and emotional support.</p>
+                <p>Navigate the early weeks of motherhood with confidence. Get answers to feeding questions, sleep
+                    guidance, and emotional support.</p>
             </div>
             <div class="demo-card">
                 <h3>Family Wellness</h3>
-                <p>Evidence-based resources for your growing family, from infant development to maternal health and wellness tips.</p>
+                <p>Evidence-based resources for your growing family, from infant development to maternal health and
+                    wellness tips.</p>
             </div>
         </div>
     </div>
@@ -578,10 +618,12 @@
                 </div>
                 <div>
                     <div class="message-content">
-                        👋 Hi! I'm your Clementina Health assistant. I'm here to support you through your pregnancy and parenting journey. How can I help you today?
+                        👋 Hi! I'm your Clementina Health assistant. I'm here to support you through your pregnancy and
+                        parenting journey. How can I help you today?
                     </div>
                     <div class="quick-actions">
-                        <div class="quick-action" onclick="sendQuickMessage('Pregnancy questions')">Pregnancy questions</div>
+                        <div class="quick-action" onclick="sendQuickMessage('Pregnancy questions')">Pregnancy questions
+                        </div>
                         <div class="quick-action" onclick="sendQuickMessage('Feeding help')">Feeding help</div>
                         <div class="quick-action" onclick="sendQuickMessage('Baby development')">Baby development</div>
                     </div>
@@ -591,7 +633,8 @@
 
         <!-- Typing Indicator -->
         <div class="typing-indicator" id="typingIndicator">
-            <div class="message-avatar" style="background: linear-gradient(135deg, var(--clementina-orange), var(--coral)); color: white;">
+            <div class="message-avatar"
+                style="background: linear-gradient(135deg, var(--clementina-orange), var(--coral)); color: white;">
                 <i class="fas fa-heart"></i>
             </div>
             <div>
@@ -607,14 +650,9 @@
         <!-- Input Area -->
         <div class="chatbot-input">
             <div class="input-wrapper">
-                <textarea 
-                    class="chat-input" 
-                    id="chatInput" 
-                    placeholder="Ask me anything about pregnancy, baby care, or wellness..."
-                    rows="1"
-                    onkeypress="handleKeyPress(event)"
-                    oninput="autoResize(this)"
-                ></textarea>
+                <textarea class="chat-input" id="chatInput"
+                    placeholder="Ask me anything about pregnancy, baby care, or wellness..." rows="1"
+                    onkeypress="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
                 <button class="send-button" id="sendButton" onclick="sendMessage()">
                     <i class="fas fa-paper-plane"></i>
                 </button>
@@ -628,9 +666,9 @@
         function toggleChatbot() {
             const widget = document.getElementById('chatbotWidget');
             const trigger = document.querySelector('.chatbot-trigger');
-            
+
             isOpen = !isOpen;
-            
+
             if (isOpen) {
                 widget.classList.add('open');
                 trigger.classList.add('active');
@@ -684,10 +722,10 @@
             const messagesContainer = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
-            
+
             const avatar = sender === 'bot' ? '<i class="fas fa-heart"></i>' : '<i class="fas fa-user"></i>';
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
+
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatar}</div>
                 <div>
@@ -695,7 +733,7 @@
                     <div class="message-time">${time}</div>
                 </div>
             `;
-            
+
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
@@ -728,7 +766,7 @@
             // Trigger the hidden file input
             document.getElementById('fileUploader').click();
         }
-        
+
         async function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -759,15 +797,16 @@
                 console.error('File upload error:', error);
             }
         }
-        
+
         // Dummy functions for other admin buttons
         function toggleTrainingMode() { alert('Training mode controls would be implemented here.'); }
         function viewAnalytics() { alert('Analytics dashboard would be implemented here.'); }
         function exportConversations() { alert('Conversation export would be implemented here.'); }
 
     </script>
-    
+
     <!-- Hidden file input for knowledge base uploads -->
     <input type="file" id="fileUploader" style="display: none;" onchange="handleFileUpload(event)" accept=".txt,.pdf">
 </body>
+
 </html>
