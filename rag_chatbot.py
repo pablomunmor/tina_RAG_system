@@ -1,21 +1,27 @@
 import os
 import argparse
 
-from langchain.document_loaders import TextLoader
+# Updated imports to match app.py
+from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
-from langchain.llms import OpenAI
+from langchain_openai import OpenAIEmbeddings, OpenAI
+
+# Import from secrets file
+try:
+    from secrets import OPENAI_API_KEY
+except ImportError:
+    OPENAI_API_KEY = None
 
 # --- Constants ---
 VECTOR_STORE_PATH = "faiss_index"
 
 def check_openai_api_key():
-    """Check if the OpenAI API key is set in the environment variables."""
-    if "OPENAI_API_KEY" not in os.environ:
-        print("Error: The OPENAI_API_KEY environment variable is not set.")
-        print("Please set the key and try again.")
+    """Check if the OpenAI API key is set."""
+    if not OPENAI_API_KEY:
+        print("Error: The OPENAI_API_KEY is not set in config.py.")
+        print("Please add your key to config.py and try again.")
         exit(1)
 
 def create_index(file_path: str):
@@ -43,7 +49,7 @@ def create_index(file_path: str):
     print(f"Split document into {len(texts)} chunks.")
 
     # Create embeddings
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
 
     # Create or load the FAISS vector store
     if os.path.exists(VECTOR_STORE_PATH):
@@ -74,7 +80,8 @@ def ask_question(query: str):
 
     # Load the vector store
     try:
-        db = FAISS.load_local(VECTOR_STORE_PATH, OpenAIEmbeddings(), allow_dangerous_deserialization=True)
+        embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+        db = FAISS.load_local(VECTOR_STORE_PATH, embeddings, allow_dangerous_deserialization=True)
     except Exception as e:
         print(f"Error loading the vector store: {e}")
         return
@@ -84,14 +91,14 @@ def ask_question(query: str):
 
     # Create the RetrievalQA chain
     qa_chain = RetrievalQA.from_chain_type(
-        llm=OpenAI(temperature=0.2),
+        llm=OpenAI(temperature=0.2, openai_api_key=OPENAI_API_KEY),
         chain_type="stuff",
         retriever=retriever,
         return_source_documents=True
     )
 
-    # Ask the question
-    result = qa_chain({"query": query})
+    # Ask the question - Updated to use .invoke() method
+    result = qa_chain.invoke({"query": query})
     
     print("\n--- Answer ---")
     print(result["result"])
