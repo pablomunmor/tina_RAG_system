@@ -89,3 +89,7 @@ instance/
 *.backup__pycache__/
 *.pyc
 .env
+config.py
+.env
+__pycache__/
+*.pyc
