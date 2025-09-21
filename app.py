@@ -1,8 +1,6 @@
 import os
 import json
 import datetime
-import asyncio
-import time
 from flask import Flask, request, jsonify, render_template, session
 from werkzeug.utils import secure_filename
 
@@ -22,7 +20,13 @@ try:
 except ImportError:
     HUGGING_FACE_HUB_API_TOKEN = None
     OPENAI_API_KEY = None
-    print("⚠️  Warning: config.py not found. Using fallback responses.")
+    print("⚠️  Warning: config.py not found. Copy config_template.py to config.py and add your API keys.")
+
+# Fallback to environment variables
+if not HUGGING_FACE_HUB_API_TOKEN:
+    HUGGING_FACE_HUB_API_TOKEN = os.getenv('HUGGING_FACE_HUB_API_TOKEN')
+if not OPENAI_API_KEY:
+    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # Constants
 UPLOAD_FOLDER = 'uploaded_files'
@@ -39,101 +43,24 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(LOGS_FOLDER, exist_ok=True)
 
-# Enhanced knowledge base with conversational, supportive tone
-CLEMENTINA_KNOWLEDGE = {
-    "newborn_safety": {
-        "keywords": ["blanket", "pillow", "crib", "sleep", "newborn", "baby sleep", "safe sleep", "sids", "suffocation"],
-        "response": [
-            "I can hear the love and care in your question about keeping your little one comfortable and safe. Sleep safety is one of those areas where the guidelines have really evolved over the years, and I know it might feel different from what our own parents did.",
-            
-            "Here's what we know helps keep babies safest while they sleep: the crib is actually best when it's pretty bare - just your baby on a firm mattress with a fitted sheet. I know that might sound stark or even cold, but babies actually sleep really well this way!",
-            
-            "The reason we skip blankets and pillows for the first year isn't to make things harder - it's because babies' breathing and movement are still developing. Unlike us, they can't easily move their heads if something covers their face, and their little bodies handle temperature differently than ours do.",
-            
-            "Now, I know you're probably thinking 'but how do I keep my baby warm?' And that's such a natural parent concern! Sleep sacks or wearable blankets are amazing for this - they keep baby cozy without any loose fabric. You can also layer their clothing based on room temperature.",
-            
-            "A good rule of thumb is to dress baby in one more layer than you'd be comfortable in. Feel their chest (not hands or feet - those are often cooler) to check if they're warm but not sweaty.",
-            
-            "The bare crib guideline typically lasts until around baby's first birthday, when they're much more mobile and can move around freely. Then you can gradually introduce a small blanket, and pillows usually come later when they transition to a toddler bed.",
-            
-            "I know these guidelines can feel overwhelming when you just want to create a cozy nest for your little one. Remember, you're doing an amazing job thinking ahead about safety - that's exactly the kind of thoughtful parent your baby needs."
-        ]
-    },
-    "exercise_pregnancy": {
-        "keywords": ["exercise", "run", "marathon", "workout", "gym", "fitness", "activity", "pregnant", "pregnancy"],
-        "response": [
-            "What an exciting goal! I love that you're thinking about staying active - movement during pregnancy can be such a gift to both you and your baby.",
-            
-            "Marathon running is definitely one of those topics where your individual experience really matters. If you were already running long distances before pregnancy, your body might handle continued training differently than someone just starting out.",
-            
-            "That said, marathons are pretty intense even for experienced runners, and pregnancy adds some extra considerations. Your body is already working overtime growing a baby, your center of gravity changes, and your joints are more flexible due to hormones.",
-            
-            "Most healthcare providers lean toward modifying distance and intensity during pregnancy, even for seasoned runners. The general sweet spot tends to be around 150 minutes of moderate activity per week - which could absolutely include running, just maybe shorter distances.",
-            
-            "What I'd really encourage is having an honest conversation with your doctor or midwife about your running background, current fitness level, and how this pregnancy is going. They know your body and your specific situation best.",
-            
-            "There are also some wonderful alternatives that might scratch that same itch - like training for a shorter race during pregnancy and saving the marathon goal for after baby arrives. Some people find pregnancy running actually helps them discover new favorite distances!",
-            
-            "Whatever you decide, listen to your body above all else. If something feels off, it probably is. And remember, there's no 'perfect' way to stay fit during pregnancy - the best exercise is the one that feels good and keeps you both healthy."
-        ]
-    },
-    "breastfeeding": {
-        "keywords": ["breastfeed", "nursing", "latch", "milk", "feeding", "breast", "formula", "bottle"],
-        "response": [
-            "Breastfeeding - there's so much emotion wrapped up in this topic, isn't there? Whether you're just starting to think about it or you're in the thick of it, know that whatever you're feeling is completely normal.",
-            
-            "If you're just getting started, those first few days can feel like you're both learning a completely new language together. Skin-to-skin time right after birth often helps, but don't worry if it doesn't click immediately - you're both figuring this out.",
-            
-            "Watch for your baby's early hunger signs - they'll start rooting around, making little sucking motions, or bringing hands to mouth. These cues are usually easier to work with than waiting for crying, which is often a later hunger sign.",
-            
-            "When it comes to latch, you want baby's mouth to cover a good portion of the darker area around your nipple, not just the tip. It might feel uncomfortable at first, but it shouldn't be consistently painful. If it hurts beyond those first few seconds, it's worth getting some help.",
-            
-            "Speaking of help - please don't hesitate to reach out if you're struggling. Lactation consultants, your healthcare provider, or even experienced friends can make such a difference. Sometimes just a small positioning adjustment changes everything.",
-            
-            "And remember, fed is best. Whether that's breastfeeding, formula feeding, or a combination, you're nourishing your baby and that's what matters. There's no prize for suffering through breastfeeding if it's not working for your family.",
-            
-            "Trust your instincts, be patient with yourself, and know that whatever feeding journey you're on is the right one for you and your baby."
-        ]
-    },
-    "pregnancy_symptoms": {
-        "keywords": ["nausea", "morning sickness", "tired", "fatigue", "symptoms", "sick", "vomit", "headache"],
-        "response": [
-            "Oh, pregnancy symptoms - they can really knock you off your feet, can't they? First off, what you're feeling is so incredibly common, even if it doesn't feel that way when you're in the middle of it.",
-            
-            "Morning sickness is probably one of the biggest misnomers out there - it can strike any time of day! Around 70-80% of pregnant people experience it, usually starting around 6 weeks. For most, it starts to ease up in the second trimester, though everyone's timeline is different.",
-            
-            "Fatigue is another big one, especially in early pregnancy. Your body is literally building another human being, plus your blood volume is increasing, hormones are surging - no wonder you feel wiped out! This often gets better in the second trimester too.",
-            
-            "For nausea, small frequent meals often help more than trying to eat regular-sized meals. Keeping crackers by your bed and nibbling a few before you even get up can sometimes help. Ginger - whether as tea, candy, or even ginger ale - seems to help some people.",
-            
-            "With fatigue, rest when you can, even if it's just putting your feet up for 10 minutes. Gentle movement like short walks can sometimes help energy levels, but don't push yourself.",
-            
-            "That said, if you're vomiting so much you can't keep fluids down, losing weight, or having severe abdominal pain, definitely call your healthcare provider. The same goes for heavy bleeding or high fever.",
-            
-            "Remember, every pregnancy is different. Try not to compare your experience to others - your body is doing exactly what it needs to do for your baby."
-        ]
-    },
-    "postpartum": {
-        "keywords": ["postpartum", "after birth", "recovery", "baby blues", "depression", "healing"],
-        "response": [
-            "The postpartum period - it's such a whirlwind of physical recovery, emotional changes, and learning to care for your new little person. Please be gentle with yourself during this time.",
-            
-            "Your body has just done something incredible, and healing takes time. For vaginal deliveries, you're looking at about 6-8 weeks for the major healing, longer for C-sections. But honestly, feeling 'back to normal' often takes longer than that, and that's completely okay.",
-            
-            "Rest really is medicine right now. I know everyone says 'sleep when the baby sleeps,' and I know that can feel impossible with everything else going on. But try to take it seriously - even lying down for 20 minutes can help.",
-            
-            "Emotionally, those first few weeks can be a rollercoaster. Baby blues are incredibly common - mood swings, crying spells, feeling overwhelmed. This usually peaks around day 3-5 and starts to settle by two weeks.",
-            
-            "If you're feeling sad, anxious, or disconnected beyond those first two weeks, or if you're having thoughts about harming yourself or baby, please reach out for help. Postpartum depression and anxiety are real, treatable, and nothing to be ashamed of.",
-            
-            "Accept help when people offer it. Let someone else hold the baby while you shower, or bring you a meal, or throw in a load of laundry. You don't have to do this alone.",
-            
-            "Be patient with the bonding process too. Not everyone feels that instant overwhelming love - sometimes it grows gradually, and that's normal too.",
-            
-            "You're learning to be a parent just like your baby is learning to be in the world. Give yourself the same patience and grace you'd give your best friend going through this."
-        ]
-    }
-}
+# Clementina's Personality Template
+CLEMENTINA_TEMPLATE = """You are Clementina, a compassionate and knowledgeable maternal health assistant. You have the warmth of a trusted midwife combined with evidence-based medical knowledge.
+
+Your personality:
+- Speak with gentle authority and professional warmth
+- Use phrases like "I understand this can be concerning" and "Let me help you with that"
+- Acknowledge the emotional aspects of pregnancy, childbirth, and parenting
+- Be encouraging but realistic about health topics
+- Show empathy for the physical and emotional challenges parents face
+
+IMPORTANT MEDICAL DISCLAIMER: Always remind users that your guidance is educational and they should consult their healthcare provider for personalized medical advice, especially for urgent concerns.
+
+Knowledge Base Context:
+{context}
+
+Question: {question}
+
+Clementina's caring response:"""
 
 def log_conversation(user_message, bot_response, sources, feedback=None, user_name=None):
     """Log conversations for quality improvement and analysis."""
@@ -159,70 +86,120 @@ def log_conversation(user_message, bot_response, sources, feedback=None, user_na
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def get_built_in_response(query, user_name=None):
-    """Check if query matches built-in knowledge and return appropriate response."""
-    query_lower = query.lower()
-    name_prefix = f"Hi {user_name}! " if user_name else ""
-    
-    # Check each knowledge topic
-    for topic, info in CLEMENTINA_KNOWLEDGE.items():
-        # More flexible keyword matching
-        matches = 0
-        total_keywords = len(info["keywords"])
-        
-        for keyword in info["keywords"]:
-            if keyword in query_lower:
-                matches += 1
-        
-        # If we find any keywords, return this topic (lowered threshold)
-        if matches > 0:
-            response_parts = info["response"].copy()
-            # Add personalized greeting to first paragraph
-            if name_prefix:
-                response_parts[0] = name_prefix + response_parts[0]
-            
-            # Add medical disclaimer in conversational tone
-            disclaimer = "Of course, I always want to remind you that while I'm here to share information and support, your healthcare provider knows you and your specific situation best. Don't hesitate to reach out to them with any concerns - that's what they're there for!"
-            response_parts.append(disclaimer)
-            
-            print(f"Found match for topic '{topic}' with {matches} keyword matches")
-            return response_parts
-    
-    print(f"No knowledge match found for query: '{query_lower}'")
-    return None
+def get_llm_and_embeddings(provider: str):
+    """Returns the appropriate LLM and embeddings based on the provider."""
+    if provider == 'openai':
+        if not OPENAI_API_KEY:
+            raise ValueError("OPENAI_API_KEY not set. Please add it to config.py or set as environment variable.")
+        embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+        llm = OpenAI(temperature=0.3, openai_api_key=OPENAI_API_KEY)
+        return llm, embeddings
+    elif provider == 'local':
+        if not HUGGING_FACE_HUB_API_TOKEN:
+            print("⚠️  Warning: HUGGING_FACE_HUB_API_TOKEN not set. Using local model without API.")
+        embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        llm = HuggingFacePipeline.from_model_id(
+            model_id="google/flan-t5-large",
+            task="text2text-generation",
+            pipeline_kwargs={"max_new_tokens": 300, "temperature": 0.3},
+        )
+        return llm, embeddings
+    else:
+        raise ValueError(f"Unsupported provider: {provider}. Choose 'openai' or 'local'.")
 
-def generate_caring_fallback(query, user_name=None):
-    """Generate a caring, helpful fallback response."""
-    name_prefix = f"{user_name}, " if user_name else ""
+def create_index(file_path: str, provider: str = 'openai'):
+    """Loads a document, splits it, creates embeddings, and stores them in FAISS."""
+    print(f"Processing medical content: {file_path} with provider: {provider}")
     
-    return [
-        f"Hi {name_prefix}thank you for trusting me with your question about '{query}'. This sounds like such an important topic for you and your family.",
+    if file_path.lower().endswith('.pdf'):
+        loader = PyPDFLoader(file_path)
+    else:
+        loader = TextLoader(file_path)
         
-        "You know, I want to give you the most helpful and accurate information possible, but I think this particular question might benefit from the expertise of someone who knows your specific situation.",
-        
-        "Here's what I'd suggest: your healthcare provider, whether that's your doctor, midwife, or pediatrician, would be perfect for this question. They know your medical history and can give you personalized guidance.",
-        
-        "You might also find it helpful to connect with other parents in your area - sometimes local parenting groups or pregnancy classes can be wonderful sources of support and shared experiences.",
-        
-        "I'm still here if you have other questions I might be able to help with. Sometimes approaching topics from a different angle can open up new conversations!",
-        
-        "Remember, asking questions means you're being thoughtful and proactive about your health and your baby's wellbeing. That's exactly the kind of care your family deserves."
-    ]
+    documents = loader.load()
+    if not documents:
+        raise ValueError("Could not load any documents from the file.")
 
-def ask_question(query: str, provider: str = 'local', user_name: str = None):
-    """Answers a question using built-in knowledge first, then RAG if available."""
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=800,
+        chunk_overlap=150,
+        separators=["\n\n", "\n", ". ", " ", ""]
+    )
+    texts = text_splitter.split_documents(documents)
+    if not texts:
+        raise ValueError("Could not split the document into text chunks.")
+        
+    print(f"Split medical document into {len(texts)} chunks for precise retrieval.")
+
+    _, embeddings = get_llm_and_embeddings(provider)
+
+    if os.path.exists(VECTOR_STORE_PATH):
+        print("Merging with existing knowledge base...")
+        # SECURITY NOTE: allow_dangerous_deserialization is set to True because we are loading
+        # a FAISS index from a local file. This is safe in this context because the file is
+        # generated by the application itself. In a production environment where the index
+        # might come from an untrusted source, this should be handled with more care.
+        db = FAISS.load_local(VECTOR_STORE_PATH, embeddings, allow_dangerous_deserialization=True)
+        db.add_documents(texts)
+    else:
+        print("Creating new knowledge base...")
+        db = FAISS.from_documents(texts, embeddings)
     
-    print(f"Processing query: '{query}' for user: {user_name}")
+    db.save_local(VECTOR_STORE_PATH)
+    print(f"Medical knowledge base updated and saved at '{VECTOR_STORE_PATH}'.")
+
+def initialize_faiss_index():
+    """Create an empty FAISS index if one doesn't exist."""
+    if not os.path.exists(VECTOR_STORE_PATH) or not os.path.exists(os.path.join(VECTOR_STORE_PATH, "index.faiss")):
+        print("Creating an empty FAISS index.")
+        _, embeddings = get_llm_and_embeddings('openai')
+        # Create an empty index with some dummy data
+        db = FAISS.from_texts(["Clementina is ready to help."], embeddings)
+        db.save_local(VECTOR_STORE_PATH)
+        print("Empty FAISS index created.")
+
+def ask_question(query: str, provider: str = 'openai', user_name: str = None):
+    """Answers a question using the RAG pipeline with Clementina's personality."""
+    if not os.path.exists(VECTOR_STORE_PATH):
+        return ["I don't have access to my knowledge base yet. Please ask an administrator to upload some medical content first so I can help you better."], []
+
+    llm, embeddings = get_llm_and_embeddings(provider)
+    # SECURITY NOTE: allow_dangerous_deserialization is set to True because we are loading
+    # a FAISS index from a local file. This is safe in this context because the file is
+    # generated by the application itself. In a production environment where the index
+    # might come from an untrusted source, this should be handled with more care.
+    db = FAISS.load_local(VECTOR_STORE_PATH, embeddings, allow_dangerous_deserialization=True)
     
-    # First, try built-in knowledge
-    built_in_response = get_built_in_response(query, user_name)
-    if built_in_response:
-        print("Found built-in response")
-        return built_in_response, ["Built-in Clementina Knowledge"]
+    retriever = db.as_retriever(search_kwargs={"k": 4})
+
+    PROMPT = PromptTemplate(
+        template=CLEMENTINA_TEMPLATE,
+        input_variables=["context", "question"]
+    )
+
+    qa_chain = RetrievalQA.from_chain_type(
+        llm=llm,
+        chain_type="stuff",
+        retriever=retriever,
+        return_source_documents=True,
+        chain_type_kwargs={"prompt": PROMPT}
+    )
+
+    result = qa_chain.invoke(query)
+    answer = result.get("result", "I'm sorry, I couldn't find information to help with that question.")
+    sources = [doc.metadata.get('source', 'N/A') for doc in result.get("source_documents", [])]
     
-    print("No built-in response found, using fallback")
-    # Fallback response
-    return generate_caring_fallback(query, user_name), ["Clementina's General Guidance"]
+    health_keywords = ['pregnancy', 'baby', 'birth', 'pain', 'bleeding', 'symptom', 'medical', 'health', 'doctor', 'medication']
+    if any(keyword in query.lower() for keyword in health_keywords):
+        disclaimer = "\n\n💗 Remember: This information is for educational purposes only. Please consult with your healthcare provider for personalized medical advice, especially if you have specific concerns or symptoms."
+        answer += disclaimer
+    
+    answer_parts = [p.strip() for p in answer.split("\n\n") if p.strip()]
+    
+    if user_name:
+        answer_parts[0] = f"Hi {user_name}! {answer_parts[0]}"
+
+    return answer_parts, sources
 
 # Flask Routes
 @app.route('/')
@@ -243,7 +220,7 @@ def set_name():
 def handle_ask():
     data = request.json
     query = data.get('message')
-    provider = data.get('provider', 'local')
+    provider = data.get('provider', 'openai')
     user_name = session.get('user_name')
 
     if not query:
@@ -264,9 +241,8 @@ def handle_ask():
         })
     except Exception as e:
         print(f"Error in handle_ask: {e}")
-        fallback_answer = generate_caring_fallback(query, user_name)
         return jsonify({
-            "answer_parts": fallback_answer,
+            "answer_parts": ["I'm sorry, I'm having a little trouble right now. Please try again in a moment."],
             "sources": ["Clementina's Care"],
             "conversation_id": f"fallback_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
         })
@@ -372,15 +348,18 @@ def handle_upload():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         
-        try:
-            return jsonify({"success": f"Medical content '{filename}' has been uploaded successfully. RAG integration coming soon!"})
-        except Exception as e:
-            print(f"Upload error: {e}")
-            return jsonify({"error": f"Failed to process file: {e}"}), 500
+        provider = request.form.get('provider', 'openai')
 
-    return jsonify({"error": "File type not supported."}), 400
+        try:
+            create_index(filepath, provider)
+            return jsonify({"success": f"Medical content '{filename}' has been reviewed and added to my knowledge base successfully."})
+        except Exception as e:
+            return jsonify({"error": f"Failed to process medical content: {e}"}), 500
+
+    return jsonify({"error": "File type not supported. Please upload .txt or .pdf files only."}), 400
 
 if __name__ == '__main__':
+    initialize_faiss_index()
     print("🌸 Clementina Health Assistant starting up...")
     print("💬 Conversational tone enabled")
     print("👤 Name collection in main input")
