@@ -13,3 +13,4 @@ transformers
 langchain-openai
 langchain-huggingface
 accelerate
+python-dotenv
