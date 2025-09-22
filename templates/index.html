@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Clementina Health - AI Assistant</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -30,6 +30,7 @@
             background: linear-gradient(135deg, var(--calm-cream), #fff);
             min-height: 100vh;
             position: relative;
+            overflow-x: hidden;
         }
 
         .demo-content {
@@ -103,12 +104,21 @@
             transform: scale(1.1);
         }
 
-        .chatbot-trigger i {
+        .chatbot-trigger .clementina-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #F47C3C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
             color: white;
-            font-size: 24px;
+            transition: transform 0.3s ease;
         }
 
-        .chatbot-trigger.active i {
+        .chatbot-trigger.active .clementina-logo {
             transform: rotate(45deg);
         }
 
@@ -164,7 +174,21 @@
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+        }
+
+        .chatbot-title .clementina-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         .chatbot-subtitle {
@@ -173,6 +197,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            margin-top: 4px;
         }
 
         .status-dot {
@@ -201,10 +226,10 @@
             color: white;
             font-size: 20px;
             cursor: pointer;
-            padding: 5px;
+            padding: 8px;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -258,6 +283,8 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            font-size: 16px;
+            font-weight: bold;
         }
 
         .message.bot .message-avatar {
@@ -341,46 +368,6 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
-
-        .feedback-section {
-            margin-top: 10px;
-            padding: 8px 0;
-            border-top: 1px solid var(--soft-gray);
-        }
-
-        .feedback-prompt {
-            font-size: 0.8rem;
-            margin-bottom: 8px;
-            opacity: 0.8;
-        }
-
-        .star-rating {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 8px;
-        }
-
-        .star {
-            font-size: 16px;
-            color: #ddd;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .star:hover,
-        .star.active {
-            color: #FFD700;
-        }
-
-        .feedback-input {
-            width: 100%;
-            padding: 6px 8px;
-            font-size: 0.75rem;
-            border: 1px solid var(--soft-gray);
-            border-radius: 6px;
-            resize: none;
-            display: none;
         }
 
         .message-time {
@@ -474,6 +461,7 @@
             padding: 20px;
             background: white;
             border-top: 1px solid var(--soft-gray);
+            position: relative;
         }
 
         .input-wrapper {
@@ -483,6 +471,7 @@
             background: var(--soft-gray);
             border-radius: 25px;
             padding: 8px;
+            position: relative;
         }
 
         .chat-input {
@@ -497,6 +486,24 @@
             outline: none;
         }
 
+        .warning-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 25px;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 0.85rem;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+            max-width: calc(100% - 80px);
+            line-height: 1.3;
+        }
+
+        .warning-placeholder.hidden {
+            opacity: 0;
+        }
+
         .send-button {
             width: 40px;
             height: 40px;
@@ -509,6 +516,7 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
+            flex-shrink: 0;
         }
 
         .send-button:hover {
@@ -627,21 +635,130 @@
             font-weight: 600;
         }
 
+        /* Mobile Optimizations */
         @media (max-width: 480px) {
+            .demo-content {
+                padding: 20px 15px;
+            }
+
+            .demo-header h1 {
+                font-size: 2rem;
+            }
+
+            .demo-sections {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .chatbot-trigger {
+                bottom: 20px;
+                right: 20px;
+                width: 56px;
+                height: 56px;
+            }
+
+            .chatbot-trigger .clementina-logo {
+                width: 28px;
+                height: 28px;
+                font-size: 18px;
+            }
+
             .chatbot-widget {
                 bottom: 0;
                 right: 0;
                 left: 0;
+                top: 0;
                 width: 100vw;
                 height: 100vh;
                 border-radius: 0;
+                transform: translateY(100%);
+            }
+
+            .chatbot-widget.open {
+                transform: translateY(0);
+            }
+
+            .chatbot-header {
+                padding: 15px 20px;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+
+            .chatbot-messages {
+                padding: 15px;
+                padding-bottom: env(safe-area-inset-bottom, 0);
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .chatbot-input {
+                padding: 15px;
+                padding-bottom: calc(15px + env(safe-area-inset-bottom, 0));
+                position: sticky;
+                bottom: 0;
+                background: white;
+                border-top: 1px solid var(--soft-gray);
+            }
+
+            .input-wrapper {
+                background: var(--soft-gray);
+                border-radius: 25px;
+                padding: 6px;
+            }
+
+            .chat-input {
+                padding: 12px 15px;
+                font-size: 16px;
+                /* Prevents zoom on iOS */
+            }
+
+            .warning-placeholder {
+                font-size: 0.8rem;
+                left: 21px;
+                max-width: calc(100% - 70px);
             }
 
             .admin-panel {
                 position: relative;
-                margin: 20px;
+                margin: 15px;
                 width: auto;
+                max-width: none;
             }
+
+            /* Handle virtual keyboard */
+            .chatbot-widget.keyboard-open {
+                height: 100vh;
+            }
+
+            .chatbot-widget.keyboard-open .chatbot-messages {
+                flex: 1;
+                min-height: 0;
+            }
+        }
+
+        /* Tablet optimizations */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .chatbot-widget {
+                width: 420px;
+                height: 650px;
+            }
+        }
+
+        /* Enhanced focus states for accessibility */
+        .chat-input:focus,
+        .send-button:focus,
+        .close-button:focus,
+        .quick-action:focus {
+            outline: 2px solid var(--clementina-orange);
+            outline-offset: 2px;
+        }
+
+        /* Smooth scrolling */
+        .chatbot-messages {
+            scroll-behavior: smooth;
         }
     </style>
 </head>
@@ -710,15 +827,15 @@
     </div>
 
     <button class="chatbot-trigger" onclick="toggleChatbot()">
-        <i class="fas fa-comment-medical"></i>
+        <div class="clementina-logo">C</div>
     </button>
 
     <div class="chatbot-widget" id="chatbotWidget">
         <div class="chatbot-header">
             <div class="chatbot-header-content">
                 <div class="chatbot-title">
-                    <i class="fas fa-heart"></i>
-                    Clementina Assistant
+                    <div class="clementina-logo">C</div>
+                    Tina
                 </div>
                 <div class="chatbot-subtitle">
                     <span class="status-dot"></span>
@@ -732,33 +849,11 @@
 
         <div class="chatbot-messages" id="chatMessages">
             <div class="message bot">
-                <div class="message-avatar">
-                    <i class="fas fa-heart"></i>
-                </div>
+                <div class="message-avatar">C</div>
                 <div>
                     <div class="message-content">
-                        Hello! I'm Clementina, your maternal health assistant. I'm here to provide caring,
-                        evidence-based support for your pregnancy and parenting journey. I understand this time can
-                        bring many questions and concerns.
-
-                        <div
-                            style="margin-top: 12px; padding: 8px; background: rgba(244, 124, 60, 0.1); border-radius: 8px; font-size: 0.8rem;">
-                            <i class="fas fa-info-circle" style="color: var(--clementina-orange);"></i>
-                            <strong>Important:</strong> My guidance is educational. Always consult your healthcare
-                            provider for personalized medical advice.
-                        </div>
-                    </div>
-                    <div class="quick-actions">
-                        <div class="quick-action"
-                            onclick="sendQuickMessage('I have questions about pregnancy symptoms')">Pregnancy symptoms
-                        </div>
-                        <div class="quick-action" onclick="sendQuickMessage('I need help with breastfeeding')">
-                            Breastfeeding support</div>
-                        <div class="quick-action"
-                            onclick="sendQuickMessage('Can I put a blanket on my newborn crib and a pillow?')">Newborn
-                            sleep safety</div>
-                        <div class="quick-action" onclick="sendQuickMessage('I am feeling anxious about labor')">Labor
-                            concerns</div>
+                        Hello! I'm Tina, your maternal health assistant. I'm here to provide caring, evidence-based
+                        support for your pregnancy and parenting journey.
                     </div>
                 </div>
             </div>
@@ -767,10 +862,10 @@
         <div class="typing-indicator" id="typingIndicator">
             <div class="message-avatar"
                 style="background: linear-gradient(135deg, var(--clementina-orange), var(--coral)); color: white;">
-                <i class="fas fa-heart"></i>
+                C
             </div>
             <div>
-                <div class="typing-message" id="typingMessage">Clementina is thinking...</div>
+                <div class="typing-message" id="typingMessage">Tina is thinking...</div>
                 <div class="typing-dots">
                     <div class="typing-dot"></div>
                     <div class="typing-dot"></div>
@@ -781,9 +876,13 @@
 
         <div class="chatbot-input">
             <div class="input-wrapper">
-                <textarea class="chat-input" id="chatInput"
-                    placeholder="Share your name or ask about pregnancy, childbirth, newborn care, or wellness..."
-                    rows="1" onkeypress="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
+                <div class="warning-placeholder" id="warningPlaceholder">
+                    ⚠️ My guidance is educational. Always consult your healthcare provider for personalized medical
+                    advice.
+                </div>
+                <textarea class="chat-input" id="chatInput" placeholder="" rows="1" onkeypress="handleKeyPress(event)"
+                    oninput="autoResize(this); handleInputChange(this)" onfocus="handleInputFocus()"
+                    onblur="handleInputBlur()"></textarea>
                 <button class="send-button" id="sendButton" onclick="sendMessage()">
                     <i class="fas fa-paper-plane"></i>
                 </button>
@@ -797,6 +896,54 @@
         let messageCounter = 0;
         let userName = null;
         let isNameCollected = false;
+        let hasAskedForName = false;
+        let isInputFocused = false;
+
+        // Mobile keyboard handling
+        let initialViewportHeight = window.innerHeight;
+
+        function handleViewportChange() {
+            const currentHeight = window.innerHeight;
+            const widget = document.getElementById('chatbotWidget');
+
+            if (currentHeight < initialViewportHeight * 0.8) {
+                widget.classList.add('keyboard-open');
+            } else {
+                widget.classList.remove('keyboard-open');
+            }
+        }
+
+        window.addEventListener('resize', handleViewportChange);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                initialViewportHeight = window.innerHeight;
+                handleViewportChange();
+            }, 500);
+        });
+
+        function handleInputChange(textarea) {
+            const placeholder = document.getElementById('warningPlaceholder');
+            if (textarea.value.trim() || isInputFocused) {
+                placeholder.classList.add('hidden');
+            } else {
+                placeholder.classList.remove('hidden');
+            }
+        }
+
+        function handleInputFocus() {
+            isInputFocused = true;
+            const placeholder = document.getElementById('warningPlaceholder');
+            placeholder.classList.add('hidden');
+        }
+
+        function handleInputBlur() {
+            isInputFocused = false;
+            const input = document.getElementById('chatInput');
+            const placeholder = document.getElementById('warningPlaceholder');
+            if (!input.value.trim()) {
+                placeholder.classList.remove('hidden');
+            }
+        }
 
         function toggleChatbot() {
             const widget = document.getElementById('chatbotWidget');
@@ -805,7 +952,13 @@
             if (isOpen) {
                 widget.classList.add('open');
                 trigger.classList.add('active');
-                setTimeout(() => document.getElementById('chatInput').focus(), 300);
+                setTimeout(() => {
+                    if (!hasAskedForName) {
+                        askForName();
+                        hasAskedForName = true;
+                    }
+                    document.getElementById('chatInput').focus();
+                }, 300);
             } else {
                 widget.classList.remove('open');
                 trigger.classList.remove('active');
@@ -820,6 +973,15 @@
             isOpen = false;
         }
 
+        function askForName() {
+            setTimeout(() => {
+                addSlowStreamingMessage([
+                    "I understand this time can bring many questions and concerns. I'm here to help with evidence-based guidance.",
+                    "What's your name? I'd love to make our conversation more personal."
+                ], 'bot', false);
+            }, 1000);
+        }
+
         async function sendMessage() {
             const input = document.getElementById('chatInput');
             const message = input.value.trim();
@@ -829,12 +991,14 @@
                 await handleNameSubmission(message);
                 input.value = '';
                 autoResize(input);
+                handleInputChange(input);
                 return;
             }
 
             addMessage(message, 'user');
             input.value = '';
             autoResize(input);
+            handleInputChange(input);
             showTypingIndicator();
 
             try {
@@ -853,7 +1017,7 @@
 
                 const data = await response.json();
                 currentConversationId = data.conversation_id;
-                addSlowStreamingMessage(data.answer_parts || [data.answer], 'bot', true);
+                addSlowStreamingMessage(data.answer_parts || [data.answer], 'bot', false);
 
             } catch (error) {
                 hideTypingIndicator();
@@ -887,7 +1051,6 @@
                             "Now, how can I support you today? Whether you have questions about pregnancy, newborn care, breastfeeding, or just want to chat about what's on your mind - I'm here for you."
                         ], 'bot', false);
                     }, 500);
-                    document.getElementById('chatInput').placeholder = "Ask me anything about your pregnancy or parenting journey...";
                 }
             } catch (error) {
                 console.error('Error setting name:', error);
@@ -905,42 +1068,18 @@
             const messagesContainer = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
-            const avatar = sender === 'bot' ? '<i class="fas fa-heart"></i>' : '<i class="fas fa-user"></i>';
+            const avatar = sender === 'bot' ? 'C' : '<i class="fas fa-user"></i>';
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            messageCounter++;
-            const messageId = `msg_${Date.now()}_${messageCounter}`;
-
-            let feedbackHtml = '';
-            if (enableFeedback && sender === 'bot') {
-                feedbackHtml = `
-                    <div class="feedback-section" id="feedback_${messageId}">
-                        <div class="feedback-prompt">Was this helpful?</div>
-                        <div class="star-rating" data-message-id="${messageId}">
-                            <span class="star" data-rating="1">★</span>
-                            <span class="star" data-rating="2">★</span>
-                            <span class="star" data-rating="3">★</span>
-                            <span class="star" data-rating="4">★</span>
-                            <span class="star" data-rating="5">★</span>
-                        </div>
-                        <textarea class="feedback-input" placeholder="Optional: Tell us how we can improve..." 
-                                  id="feedback_text_${messageId}"></textarea>
-                    </div>
-                `;
-            }
 
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatar}</div>
                 <div>
                     <div class="message-content">${text}</div>
                     <div class="message-time">${time}</div>
-                    ${feedbackHtml}
                 </div>
             `;
 
             messagesContainer.appendChild(messageDiv);
-            if (enableFeedback && sender === 'bot') {
-                addStarRatingHandler(messageId);
-            }
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
@@ -948,35 +1087,16 @@
             const messagesContainer = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
-            const avatar = sender === 'bot' ? '<i class="fas fa-heart"></i>' : '<i class="fas fa-user"></i>';
+            const avatar = sender === 'bot' ? 'C' : '<i class="fas fa-user"></i>';
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             messageCounter++;
             const messageId = `msg_${Date.now()}_${messageCounter}`;
-
-            let feedbackHtml = '';
-            if (enableFeedback && sender === 'bot') {
-                feedbackHtml = `
-                    <div class="feedback-section" id="feedback_${messageId}">
-                        <div class="feedback-prompt">Was this helpful?</div>
-                        <div class="star-rating" data-message-id="${messageId}">
-                            <span class="star" data-rating="1">★</span>
-                            <span class="star" data-rating="2">★</span>
-                            <span class="star" data-rating="3">★</span>
-                            <span class="star" data-rating="4">★</span>
-                            <span class="star" data-rating="5">★</span>
-                        </div>
-                        <textarea class="feedback-input" placeholder="Optional: Tell us how we can improve..." 
-                                  id="feedback_text_${messageId}"></textarea>
-                    </div>
-                `;
-            }
 
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatar}</div>
                 <div>
                     <div class="message-content" id="content_${messageId}"></div>
                     <div class="message-time">${time}</div>
-                    ${feedbackHtml}
                 </div>
             `;
 
@@ -986,7 +1106,7 @@
             const contentDiv = document.getElementById(`content_${messageId}`);
             paragraphs.forEach((paragraph, index) => {
                 setTimeout(() => {
-                    updateTypingMessage(`Clementina is typing...`);
+                    updateTypingMessage(`Tina is typing...`);
                     showTypingIndicator();
 
                     setTimeout(() => {
@@ -1006,74 +1126,10 @@
 
                 }, index * 3000); // 3 second delay between paragraphs
             });
-
-            // Add feedback after all paragraphs are shown
-            if (enableFeedback && sender === 'bot') {
-                setTimeout(() => {
-                    addStarRatingHandler(messageId);
-                }, paragraphs.length * 3000 + 2000);
-            }
         }
 
         function updateTypingMessage(message) {
             document.getElementById('typingMessage').textContent = message;
-        }
-
-        function addStarRatingHandler(messageId) {
-            const stars = document.querySelectorAll(`[data-message-id="${messageId}"] .star`);
-            stars.forEach(star => {
-                star.addEventListener('click', function () {
-                    const rating = parseInt(this.getAttribute('data-rating'));
-                    const allStars = this.parentElement.querySelectorAll('.star');
-
-                    allStars.forEach((s, index) => {
-                        s.classList.toggle('active', index < rating);
-                    });
-
-                    const feedbackText = document.getElementById(`feedback_text_${messageId}`);
-                    if (feedbackText) {
-                        feedbackText.style.display = 'block';
-                        setTimeout(() => feedbackText.focus(), 100);
-                    }
-
-                    submitFeedback(messageId, rating);
-
-                    if (feedbackText) {
-                        feedbackText.addEventListener('blur', function () {
-                            if (this.value.trim()) {
-                                submitFeedback(messageId, rating, this.value.trim());
-                            }
-                        });
-                    }
-                });
-            });
-        }
-
-        async function submitFeedback(messageId, rating, feedbackText = '') {
-            try {
-                const response = await fetch('/feedback', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        conversation_id: currentConversationId,
-                        rating: rating,
-                        feedback: feedbackText
-                    })
-                });
-
-                if (response.ok) {
-                    const feedbackSection = document.getElementById(`feedback_${messageId}`);
-                    if (feedbackSection && !feedbackSection.querySelector('.thank-you')) {
-                        const thankYou = document.createElement('div');
-                        thankYou.className = 'thank-you';
-                        thankYou.style.cssText = 'color: var(--sage-mist); font-size: 0.8rem; font-style: italic; margin-top: 5px;';
-                        thankYou.textContent = 'Thank you for your feedback!';
-                        feedbackSection.appendChild(thankYou);
-                    }
-                }
-            } catch (error) {
-                console.error('Error submitting feedback:', error);
-            }
         }
 
         function showTypingIndicator() {
@@ -1197,6 +1253,16 @@
                 } else if (isOpen) {
                     closeChatbot();
                 }
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            // Set initial placeholder state
+            const input = document.getElementById('chatInput');
+            const placeholder = document.getElementById('warningPlaceholder');
+            if (!input.value.trim()) {
+                placeholder.classList.remove('hidden');
             }
         });
     </script>
