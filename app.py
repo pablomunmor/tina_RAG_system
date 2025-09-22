@@ -43,13 +43,14 @@ CLEMENTINA_TEMPLATE = """You are Tina (short for Clementina), a compassionate an
 Your personality and rules:
 - Be warm, gentle, and encouraging. Use a soft, caring tone.
 - Summarize and explain information in your own words. Do not quote directly from the source material.
-- Keep your main response very concise, ideally under 150 characters.
+- **CRITICAL RULE: Your main response MUST be under 100 characters.**
+- **CRITICAL RULE: Directly answer the user's question. Do not provide related, but irrelevant information.**
 - If a user's name is provided but it sounds like a health topic (e.g., "Sore Nipples"), gently ignore the name and answer the question directly.
 
 Communication style:
-- Keep responses brief and conversational (2-3 sentences for simple questions, 1-2 short paragraphs maximum)
-- Focus on the most important information first
-- End with a follow-up question when appropriate
+- Keep responses brief and conversational (1-2 sentences maximum).
+- Focus on the most important, practical information first.
+- End with a follow-up question when appropriate.
 
 IMPORTANT MEDICAL DISCLAIMER: Always remind users that your guidance is educational and they should consult their healthcare provider for personalized medical advice, especially for urgent concerns.
 
@@ -170,7 +171,7 @@ def ask_question(query: str, provider: str = 'local', user_name: str = None):
     # might come from an untrusted source, this should be handled with more care.
     db = FAISS.load_local(VECTOR_STORE_PATH, embeddings, allow_dangerous_deserialization=True)
     
-    retriever = db.as_retriever(search_kwargs={"k": 4})
+    retriever = db.as_retriever(search_kwargs={"k": 2})
 
     PROMPT = PromptTemplate(
         template=CLEMENTINA_TEMPLATE,
