@@ -14,19 +14,12 @@ from langchain_huggingface import HuggingFacePipeline, HuggingFaceEmbeddings
 from langchain_openai import OpenAIEmbeddings, OpenAI
 
 # Configuration
-try:
-    from config import HUGGING_FACE_HUB_API_TOKEN, OPENAI_API_KEY
-    print("✓ Configuration loaded successfully")
-except ImportError:
-    HUGGING_FACE_HUB_API_TOKEN = None
-    OPENAI_API_KEY = None
-    print("⚠️  Warning: config.py not found. Copy config_template.py to config.py and add your API keys.")
+from dotenv import load_dotenv
+load_dotenv()
 
 # Fallback to environment variables
-if not HUGGING_FACE_HUB_API_TOKEN:
-    HUGGING_FACE_HUB_API_TOKEN = os.getenv('HUGGING_FACE_HUB_API_TOKEN')
-if not OPENAI_API_KEY:
-    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+HUGGING_FACE_HUB_API_TOKEN = os.getenv('HUGGING_FACE_HUB_API_TOKEN')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # Constants
 UPLOAD_FOLDER = 'uploaded_files'
@@ -90,7 +83,7 @@ def get_llm_and_embeddings(provider: str):
     """Returns the appropriate LLM and embeddings based on the provider."""
     if provider == 'openai':
         if not OPENAI_API_KEY:
-            raise ValueError("OPENAI_API_KEY not set. Please add it to config.py or set as environment variable.")
+            raise ValueError("OPENAI_API_KEY not set. Please add it to .env or set as environment variable.")
         embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
         llm = OpenAI(temperature=0.3, openai_api_key=OPENAI_API_KEY)
         return llm, embeddings

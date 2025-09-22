@@ -8,11 +8,11 @@ from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain_openai import OpenAIEmbeddings, OpenAI
 
-# Import from secrets file
-try:
-    from secrets import OPENAI_API_KEY
-except ImportError:
-    OPENAI_API_KEY = None
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # --- Constants ---
 VECTOR_STORE_PATH = "faiss_index"
@@ -20,8 +20,8 @@ VECTOR_STORE_PATH = "faiss_index"
 def check_openai_api_key():
     """Check if the OpenAI API key is set."""
     if not OPENAI_API_KEY:
-        print("Error: The OPENAI_API_KEY is not set in config.py.")
-        print("Please add your key to config.py and try again.")
+        print("Error: The OPENAI_API_KEY is not set in your .env file.")
+        print("Please add your key to a .env file and try again.")
         exit(1)
 
 def create_index(file_path: str):
