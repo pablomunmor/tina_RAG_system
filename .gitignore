@@ -20,6 +20,7 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+*.pyc
 
 # Virtual Environment
 venv/
@@ -29,7 +30,6 @@ ENV/
 .env/
 
 # Configuration and Secrets
-config.py
 .env
 *.key
 
@@ -86,10 +86,4 @@ instance/
 
 # Backup files
 *.bak
-*.backup__pycache__/
-*.pyc
-.env
-config.py
-.env
-__pycache__/
-*.pyc
+*.backup

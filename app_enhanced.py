@@ -14,19 +14,12 @@ from langchain_huggingface import HuggingFacePipeline, HuggingFaceEmbeddings
 from langchain_openai import OpenAIEmbeddings, OpenAI
 
 # Configuration
-try:
-    from config import HUGGING_FACE_HUB_API_TOKEN, OPENAI_API_KEY
-    print("✓ Configuration loaded successfully")
-except ImportError:
-    HUGGING_FACE_HUB_API_TOKEN = None
-    OPENAI_API_KEY = None
-    print("⚠️  Warning: config.py not found. Copy config_template.py to config.py and add your API keys.")
+from dotenv import load_dotenv
+load_dotenv()
 
 # Fallback to environment variables
-if not HUGGING_FACE_HUB_API_TOKEN:
-    HUGGING_FACE_HUB_API_TOKEN = os.getenv('HUGGING_FACE_HUB_API_TOKEN')
-if not OPENAI_API_KEY:
-    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+HUGGING_FACE_HUB_API_TOKEN = os.getenv('HUGGING_FACE_HUB_API_TOKEN')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # Constants
 UPLOAD_FOLDER = 'uploaded_files'
@@ -43,14 +36,14 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(LOGS_FOLDER, exist_ok=True)
 
 # Clementina's Personality Template
-CLEMENTINA_TEMPLATE = """You are Clementina, a compassionate and knowledgeable maternal health assistant. You have the warmth of a trusted midwife combined with evidence-based medical knowledge.
+CLEMENTINA_TEMPLATE = """You are Clementina, a compassionate, empathetic, and knowledgeable maternal health assistant. Your goal is to provide clear, supportive, and reassuring guidance.
 
-Your personality:
-- Speak with gentle authority and professional warmth
-- Use phrases like "I understand this can be concerning" and "Let me help you with that"
-- Acknowledge the emotional aspects of pregnancy, childbirth, and parenting
-- Be encouraging but realistic about health topics
-- Show empathy for the physical and emotional challenges parents face
+Your personality and rules:
+- Be warm, gentle, and encouraging. Use a soft, caring tone.
+- Summarize and explain information in your own words. Do not quote directly from the source material.
+- Keep your main response very concise, ideally under 150 characters.
+- After your short response, always offer to provide more detail or answer another question, for example: "Would you like to know more about this?" or "Is there anything else I can help you with?".
+- If a user's name is provided but it sounds like a health topic (e.g., "Sore Nipples"), gently ignore the name and answer the question directly.
 
 IMPORTANT MEDICAL DISCLAIMER: Always remind users that your guidance is educational and they should consult their healthcare provider for personalized medical advice, especially for urgent concerns.
 
@@ -59,7 +52,7 @@ Knowledge Base Context:
 
 Question: {question}
 
-Clementina's caring response:"""
+Clementina's caring and concise response:"""
 
 def log_conversation(user_message, bot_response, sources, feedback=None):
     """Log conversations for quality improvement and analysis."""
@@ -86,7 +79,7 @@ def get_llm_and_embeddings(provider: str):
     """Returns the appropriate LLM and embeddings based on the provider."""
     if provider == 'openai':
         if not OPENAI_API_KEY:
-            raise ValueError("OPENAI_API_KEY not set. Please add it to config.py or set as environment variable.")
+            raise ValueError("OPENAI_API_KEY not set. Please add it to .env or set as environment variable.")
         embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
         llm = OpenAI(temperature=0.3, openai_api_key=OPENAI_API_KEY)  # Slightly more creative for personality
         return llm, embeddings
@@ -119,8 +112,8 @@ def create_index(file_path: str, provider: str = 'local'):
 
     # Smaller chunks for medical content to maintain precision
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=800, 
-        chunk_overlap=150,
+        chunk_size=400,
+        chunk_overlap=50,
         separators=["\n\n", "\n", ". ", " ", ""]
     )
     texts = text_splitter.split_documents(documents)
