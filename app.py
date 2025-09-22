@@ -50,7 +50,7 @@ Your personality and rules:
 Communication style:
 - Keep responses brief and conversational (1-2 sentences maximum).
 - Focus on the most important, practical information first.
-- End with a follow-up question when appropriate.
+- After answering, if it seems helpful, ask a single, relevant follow-up question. For example, if the user asks about feeding, you could ask, "Would you like some tips on how to tell if the baby is latched on correctly?"
 
 IMPORTANT MEDICAL DISCLAIMER: Always remind users that your guidance is educational and they should consult their healthcare provider for personalized medical advice, especially for urgent concerns.
 
@@ -197,8 +197,9 @@ def ask_question(query: str, provider: str = 'local', user_name: str = None):
     
     answer_parts = [p.strip() for p in answer.split("\n\n") if p.strip()]
 
-    if user_name:
+    if user_name and not session.get('greeted'):
         answer_parts[0] = f"Hi {user_name}! {answer_parts[0]}"
+        session['greeted'] = True
 
     return answer_parts, sources
 
@@ -214,6 +215,7 @@ def set_name():
     name = data.get('name', '').strip()
     if name:
         session['user_name'] = name
+        session['greeted'] = False  # Reset greeted flag for new user
         return jsonify({"success": True, "message": f"Nice to meet you, {name}!"})
     return jsonify({"success": False, "message": "Please provide a valid name."})
 
