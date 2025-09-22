@@ -112,8 +112,8 @@ def create_index(file_path: str, provider: str = 'local'):
 
     # Smaller chunks for medical content to maintain precision
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=800, 
-        chunk_overlap=150,
+        chunk_size=400,
+        chunk_overlap=50,
         separators=["\n\n", "\n", ". ", " ", ""]
     )
     texts = text_splitter.split_documents(documents)

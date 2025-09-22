@@ -40,7 +40,7 @@ def create_index(file_path: str):
         return
 
     # Split the document into chunks
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=50)
     texts = text_splitter.split_documents(documents)
     if not texts:
         print("Could not split the document into text chunks. Exiting.")
