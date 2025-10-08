@@ -3,6 +3,7 @@ import json
 import datetime
 from flask import Flask, request, jsonify, render_template, session
 from werkzeug.utils import secure_filename
+from flask_httpauth import HTTPBasicAuth
 
 # LangChain imports
 from langchain_community.document_loaders import TextLoader, PyPDFLoader, UnstructuredWordDocumentLoader
@@ -42,6 +43,19 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'docx'}
 app = Flask(__name__)
 app.secret_key = 'clementina_health_2024'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# --- Authentication Setup ---
+auth = HTTPBasicAuth()
+APP_USER = os.getenv("APP_USER")
+APP_PASSWORD = os.getenv("APP_PASSWORD")
+
+@auth.verify_password
+def verify_password(username, password):
+    """Verify credentials for basic auth."""
+    if APP_USER and APP_PASSWORD:
+        if username == APP_USER and password == APP_PASSWORD:
+            return username
+    return None
 
 # Ensure required folders exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -228,10 +242,12 @@ Standalone question:"""
 
 # Flask Routes
 @app.route('/')
+@auth.login_required
 def serve_index():
     return render_template('index.html')
 
 @app.route('/set_name', methods=['POST'])
+@auth.login_required
 def set_name():
     """Store user's name in session."""
     data = request.json
@@ -244,6 +260,7 @@ def set_name():
     return jsonify({"success": False, "message": "Please provide a valid name."})
 
 @app.route('/ask', methods=['POST'])
+@auth.login_required
 def handle_ask():
     data = request.json
     query = data.get('message')
@@ -282,6 +299,7 @@ def handle_ask():
         })
 
 @app.route('/feedback', methods=['POST'])
+@auth.login_required
 def handle_feedback():
     data = request.json
     conversation_id = data.get('conversation_id')
@@ -311,6 +329,7 @@ def handle_feedback():
         return jsonify({"success": "Thank you for your feedback!"})
 
 @app.route('/analytics', methods=['GET'])
+@auth.login_required
 def get_analytics():
     """Get basic analytics from conversation logs."""
     try:
@@ -368,6 +387,7 @@ def get_analytics():
         return jsonify({"error": "Could not load analytics"}), 500
 
 @app.route('/upload', methods=['POST'])
+@auth.login_required
 def handle_upload():
     if 'file' not in request.files:
         return jsonify({"error": "No file part in the request."}), 400

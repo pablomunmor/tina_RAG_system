@@ -17,3 +17,4 @@ python-dotenv
 unstructured
 python-docx
 gunicorn
+Flask-HTTPAuth

@@ -106,8 +106,17 @@ This configuration tells the application to save all persistent data to the atta
 └── faiss_index/        # Vector store (gitignored)
 ```
 
-## Security Notes
+## Security
 
-- Never commit `config.py` to version control
-- API keys are loaded from local files or environment variables
-- The `.gitignore` file prevents accidental key exposure
+### Password Protection
+To secure the web interface, you can enable password protection by setting the following environment variables in your `.env` file or in your deployment service's settings:
+
+-   `APP_USER`: The username for login (e.g., `admin`).
+-   `APP_PASSWORD`: The password for login.
+
+If both variables are set, any visitor to the site will be prompted for a username and password before they can access any page.
+
+### General Notes
+- Never commit your `.env` file to version control.
+- API keys are loaded from local files or environment variables.
+- The `.gitignore` file prevents accidental key exposure.
