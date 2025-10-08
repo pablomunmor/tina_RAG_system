@@ -14,3 +14,7 @@ langchain-openai
 langchain-huggingface
 accelerate
 python-dotenv
+unstructured
+python-docx
+gunicorn
+Flask-HTTPAuth
