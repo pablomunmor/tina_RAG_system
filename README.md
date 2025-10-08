@@ -14,14 +14,16 @@ pip install -r requirements.txt
 
 ### 2. Set up API Keys
 
-1. Copy the secrets template:
-```bash
-cp secrets_template.py secrets.py
-```
+This application uses a `.env` file to manage API keys securely.
 
-2. Edit `secrets.py` and add your API keys:
-   - **HuggingFace Token**: Get from [HuggingFace Settings](https://huggingface.co/settings/tokens)
-   - **OpenAI API Key** (optional): Get from [OpenAI Platform](https://platform.openai.com/api-keys)
+1.  Create your local environment file by copying the example:
+    ```bash
+    cp .env.example .env
+    ```
+
+2.  Open the `.env` file and add your API key(s):
+    -   `HUGGING_FACE_HUB_API_TOKEN`: (Optional) Needed for the default local models. Get a token from [HuggingFace Settings](https://huggingface.co/settings/tokens).
+    -   `OPENAI_API_KEY`: (Optional) Needed if you want to use OpenAI models. Get a key from [OpenAI Platform](https://platform.openai.com/api-keys).
 
 ### 3. Create Required Directories
 
@@ -49,10 +51,10 @@ Visit `http://localhost:8080` in your browser.
 ### Command Line (Optional)
 ```bash
 # Add a document to the knowledge base
-python rag_chatbot.py --add sample_data.txt
+python rag_chatbot.py --add sample_medical_content.txt
 
 # Ask a question
-python rag_chatbot.py --ask "What does Pablo want to become?"
+python rag_chatbot.py --ask "What helps with morning sickness?"
 ```
 
 ## Features
@@ -69,8 +71,8 @@ python rag_chatbot.py --ask "What does Pablo want to become?"
 ├── app.py                 # Main Flask application
 ├── rag_chatbot.py        # Command-line interface
 ├── requirements.txt      # Python dependencies
-├── secrets_template.py   # Template for API keys
-├── secrets.py           # Your actual API keys (gitignored)
+├── .env.example         # Template for API keys
+├── .env                 # Your actual API keys (gitignored)
 ├── templates/
 │   └── index.html       # Web interface
 ├── uploaded_files/      # Uploaded documents (gitignored)
