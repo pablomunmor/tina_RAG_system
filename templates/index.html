@@ -637,6 +637,11 @@
 
         /* Mobile Optimizations */
         @media (max-width: 480px) {
+            body.chatbot-open .demo-content,
+            body.chatbot-open .admin-panel {
+                display: none;
+            }
+
             .demo-content {
                 padding: 20px 15px;
             }
@@ -759,6 +764,10 @@
         /* Smooth scrolling */
         .chatbot-messages {
             scroll-behavior: smooth;
+        }
+
+        body.chatbot-open .chatbot-trigger {
+            display: none;
         }
     </style>
 </head>
@@ -950,6 +959,7 @@
             const trigger = document.querySelector('.chatbot-trigger');
             isOpen = !isOpen;
             if (isOpen) {
+                document.body.classList.add('chatbot-open');
                 widget.classList.add('open');
                 trigger.classList.add('active');
                 setTimeout(() => {
@@ -960,6 +970,7 @@
                     document.getElementById('chatInput').focus();
                 }, 300);
             } else {
+                document.body.classList.remove('chatbot-open');
                 widget.classList.remove('open');
                 trigger.classList.remove('active');
             }
@@ -970,6 +981,7 @@
             const trigger = document.querySelector('.chatbot-trigger');
             widget.classList.remove('open');
             trigger.classList.remove('active');
+            document.body.classList.remove('chatbot-open');
             isOpen = false;
         }
 
@@ -1004,7 +1016,7 @@
                 const response = await fetch('/ask', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message, provider: 'local' })
+                    body: JSON.stringify({ message: message, provider: 'openai' })
                 });
 
                 hideTypingIndicator();
