@@ -1179,7 +1179,7 @@
 
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('provider', 'local');
+            formData.append('provider', 'openai');
 
             const statusElement = document.getElementById('knowledgeStatus');
             statusElement.textContent = `Processing ${file.name}...`;
