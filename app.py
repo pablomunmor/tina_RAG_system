@@ -135,7 +135,7 @@ def get_llm_and_embeddings(provider: str):
     else:
         raise ValueError(f"Unsupported provider: {provider}. Choose 'openai' or 'local'.")
 
-def create_index(file_path: str, provider: str = 'local'):
+def create_index(file_path: str, provider: str = 'openai'):
     """Loads a document, splits it, creates embeddings, and stores them in FAISS."""
     print(f"Processing medical content: {file_path} with provider: {provider}")
     
@@ -182,13 +182,13 @@ def initialize_faiss_index():
     """Create an empty FAISS index if one doesn't exist."""
     if not os.path.exists(VECTOR_STORE_PATH) or not os.path.exists(os.path.join(VECTOR_STORE_PATH, "index.faiss")):
         print("Creating an empty FAISS index.")
-        _, embeddings = get_llm_and_embeddings('local')
+        _, embeddings = get_llm_and_embeddings('openai')
         # Create an empty index with some dummy data
         db = FAISS.from_texts(["Clementina is ready to help."], embeddings)
         db.save_local(VECTOR_STORE_PATH)
         print("Empty FAISS index created.")
 
-def ask_question(query: str, provider: str = 'local', user_name: str = None, chat_history=None):
+def ask_question(query: str, provider: str = 'openai', user_name: str = None, chat_history=None):
     """Answers a question using the RAG pipeline with Clementina's personality and conversational memory."""
     if chat_history is None:
         chat_history = []
