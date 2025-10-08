@@ -60,7 +60,7 @@ python rag_chatbot.py --ask "What helps with morning sickness?"
 ## Features
 
 - 🤖 **Dual Provider Support**: OpenAI and local HuggingFace models
-- 📁 **Multi-format Support**: Text files (.txt) and PDFs (.pdf)
+- 📁 **Multi-format Support**: Text files (.txt), PDFs (.pdf), and Word Documents (.docx)
 - 🎨 **Professional UI**: Responsive design with health-focused branding
 - 🔒 **Secure**: API keys stored locally, not in repository
 - 📊 **Admin Panel**: Upload files and manage knowledge base
