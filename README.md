@@ -70,10 +70,10 @@ python rag_chatbot.py --ask "What helps with morning sickness?"
 This application is ready to be deployed to any hosting service that supports Python (e.g., Render, Heroku).
 
 ### Start Command
-When deploying, you will need to provide a start command. Use the following command to run the application with the Gunicorn production server. The `--timeout 120` flag is recommended to prevent timeouts during large file uploads or initial model downloads.
+When deploying, you will need to provide a start command. Use the following command to run the application with the Gunicorn production server. The `--workers 1 --threads 4` flags are crucial for running on memory-constrained environments (like Render's free tier), and `--timeout 120` prevents timeouts during large file uploads.
 
 ```bash
-gunicorn --timeout 120 app:app
+gunicorn --workers 1 --threads 4 --timeout 120 app:app
 ```
 
 ### Persistent Storage (for Render, etc.)
