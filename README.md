@@ -49,10 +49,10 @@ Visit `http://localhost:8080` in your browser.
 ### Command Line (Optional)
 ```bash
 # Add a document to the knowledge base
-python rag_chatbot.py --add sample_data.txt
+python rag_chatbot.py --add sample_medical_content.txt
 
 # Ask a question
-python rag_chatbot.py --ask "What does Pablo want to become?"
+python rag_chatbot.py --ask "What helps with morning sickness?"
 ```
 
 ## Features
