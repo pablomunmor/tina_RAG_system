@@ -14,14 +14,16 @@ pip install -r requirements.txt
 
 ### 2. Set up API Keys
 
-1. Copy the secrets template:
-```bash
-cp secrets_template.py secrets.py
-```
+This application uses a `.env` file to manage API keys securely.
 
-2. Edit `secrets.py` and add your API keys:
-   - **HuggingFace Token**: Get from [HuggingFace Settings](https://huggingface.co/settings/tokens)
-   - **OpenAI API Key** (optional): Get from [OpenAI Platform](https://platform.openai.com/api-keys)
+1.  Create your local environment file by copying the example:
+    ```bash
+    cp .env.example .env
+    ```
+
+2.  Open the `.env` file and add your API key(s):
+    -   `HUGGING_FACE_HUB_API_TOKEN`: (Optional) Needed for the default local models. Get a token from [HuggingFace Settings](https://huggingface.co/settings/tokens).
+    -   `OPENAI_API_KEY`: (Optional) Needed if you want to use OpenAI models. Get a key from [OpenAI Platform](https://platform.openai.com/api-keys).
 
 ### 3. Create Required Directories
 
@@ -49,19 +51,46 @@ Visit `http://localhost:8080` in your browser.
 ### Command Line (Optional)
 ```bash
 # Add a document to the knowledge base
-python rag_chatbot.py --add sample_data.txt
+python rag_chatbot.py --add sample_medical_content.txt
 
 # Ask a question
-python rag_chatbot.py --ask "What does Pablo want to become?"
+python rag_chatbot.py --ask "What helps with morning sickness?"
 ```
 
 ## Features
 
 - 🤖 **Dual Provider Support**: OpenAI and local HuggingFace models
-- 📁 **Multi-format Support**: Text files (.txt) and PDFs (.pdf)
+- 📁 **Multi-format Support**: Text files (.txt), PDFs (.pdf), and Word Documents (.docx)
 - 🎨 **Professional UI**: Responsive design with health-focused branding
 - 🔒 **Secure**: API keys stored locally, not in repository
 - 📊 **Admin Panel**: Upload files and manage knowledge base
+
+## Deployment
+
+This application is ready to be deployed to any hosting service that supports Python (e.g., Render, Heroku).
+
+### Start Command
+When deploying, you will need to provide a start command. Use the following command to run the application with the Gunicorn production server. The `--workers 1 --threads 4` flags are crucial for running on memory-constrained environments (like Render's free tier), and `--timeout 120` prevents timeouts during large file uploads.
+
+```bash
+gunicorn --workers 1 --threads 4 --timeout 120 app:app
+```
+
+### Persistent Storage (for Render, etc.)
+To ensure that your uploaded files and the chatbot's knowledge base (the vector store) are not lost when the server restarts or redeploys, you must use persistent storage.
+
+On a platform like **Render**, follow these steps:
+
+1.  **Add a Disk**: In your service's dashboard, go to the "Disks" section and add a new disk.
+    -   **Name**: `clementina-data` (or any name you prefer)
+    -   **Mount Path**: `/var/data`
+    -   **Size**: 1GB is a good starting point.
+
+2.  **Set the Environment Variable**: Go to the "Environment" section and add the following environment variable:
+    -   **Key**: `STORAGE_DIR`
+    -   **Value**: `/var/data` (this must match the Mount Path from the previous step).
+
+This configuration tells the application to save all persistent data to the attached disk, ensuring Tina's memory is preserved.
 
 ## File Structure
 
@@ -69,16 +98,25 @@ python rag_chatbot.py --ask "What does Pablo want to become?"
 ├── app.py                 # Main Flask application
 ├── rag_chatbot.py        # Command-line interface
 ├── requirements.txt      # Python dependencies
-├── secrets_template.py   # Template for API keys
-├── secrets.py           # Your actual API keys (gitignored)
+├── .env.example         # Template for API keys
+├── .env                 # Your actual API keys (gitignored)
 ├── templates/
 │   └── index.html       # Web interface
 ├── uploaded_files/      # Uploaded documents (gitignored)
 └── faiss_index/        # Vector store (gitignored)
 ```
 
-## Security Notes
+## Security
 
-- Never commit `config.py` to version control
-- API keys are loaded from local files or environment variables
-- The `.gitignore` file prevents accidental key exposure
+### Password Protection
+To secure the web interface, you can enable password protection by setting the following environment variables in your `.env` file or in your deployment service's settings:
+
+-   `APP_USER`: The username for login (e.g., `admin`).
+-   `APP_PASSWORD`: The password for login.
+
+If both variables are set, any visitor to the site will be prompted for a username and password before they can access any page.
+
+### General Notes
+- Never commit your `.env` file to version control.
+- API keys are loaded from local files or environment variables.
+- The `.gitignore` file prevents accidental key exposure.
