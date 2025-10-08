@@ -284,7 +284,7 @@ def set_name():
     Tasks:
     1.  Determine if the input is a plausible name (e.g., "Maria", "Jen", "David").
     2.  If it IS a name, respond with a JSON object with "is_name": true and a "message" field containing a warm, friendly, and slightly varied greeting.
-        - Example Greeting: "It's so lovely to meet you, {name}! How can I support you today?"
+        - Example Greeting: "It's so lovely to meet you, {{name}}! How can I support you today?"
         - Do not always use the same greeting. Be creative and empathetic.
     3.  If it is NOT a name (e.g., "sore nipples", "how do I breastfeed", "I'm feeling sad"), respond with a JSON object where "is_name" is false.
 
