@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, render_template, session
 from werkzeug.utils import secure_filename
 
 # LangChain imports
-from langchain_community.document_loaders import TextLoader, PyPDFLoader
+from langchain_community.document_loaders import TextLoader, PyPDFLoader, UnstructuredWordDocumentLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
@@ -25,7 +25,7 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 UPLOAD_FOLDER = 'uploaded_files'
 VECTOR_STORE_PATH = "faiss_index"
 LOGS_FOLDER = 'conversation_logs'
-ALLOWED_EXTENSIONS = {'txt', 'pdf'}
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'docx'}
 
 # App Setup
 app = Flask(__name__)
@@ -114,6 +114,8 @@ def create_index(file_path: str, provider: str = 'local'):
     
     if file_path.lower().endswith('.pdf'):
         loader = PyPDFLoader(file_path)
+    elif file_path.lower().endswith('.docx'):
+        loader = UnstructuredWordDocumentLoader(file_path)
     else:
         loader = TextLoader(file_path)
         
@@ -359,7 +361,7 @@ def handle_upload():
         except Exception as e:
             return jsonify({"error": f"Failed to process medical content: {e}"}), 500
 
-    return jsonify({"error": "File type not supported. Please upload .txt or .pdf files only."}), 400
+    return jsonify({"error": "File type not supported. Please upload .txt, .pdf, or .docx files only."}), 400
 
 if __name__ == '__main__':
     initialize_faiss_index()
