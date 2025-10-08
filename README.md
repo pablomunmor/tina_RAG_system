@@ -59,7 +59,7 @@ python rag_chatbot.py --ask "What helps with morning sickness?"
 
 ## Features
 
-- 🤖 **Dual Provider Support**: OpenAI and local HuggingFace models
+- 🤖 **Dual Provider Support**: OpenAI (default) and local HuggingFace models
 - 📁 **Multi-format Support**: Text files (.txt), PDFs (.pdf), and Word Documents (.docx)
 - 🎨 **Professional UI**: Responsive design with health-focused branding
 - 🔒 **Secure**: API keys stored locally, not in repository
@@ -69,9 +69,13 @@ python rag_chatbot.py --ask "What helps with morning sickness?"
 
 This application is ready to be deployed to any hosting service that supports Python (e.g., Render, Heroku).
 
-### Start Command
-When deploying, you will need to provide a start command. Use the following command to run the application with the Gunicorn production server. The `--workers 1 --threads 4` flags are crucial for running on memory-constrained environments (like Render's free tier), and `--timeout 120` prevents timeouts during large file uploads.
+**Note on AI Providers**: By default, this application uses the `openai` provider, which is lightweight and recommended for production deployment. The `local` provider (using HuggingFace models) is very memory-intensive and may crash on servers with limited RAM (like Render's free tier).
 
+### Start Command
+
+This project includes a `Procfile`, which tells deployment platforms like Render and Heroku how to run the application. The `Procfile` is configured to use the Gunicorn production server with settings optimized for memory-constrained environments.
+
+For platforms that do not automatically detect the `Procfile`, you can use the following command:
 ```bash
 gunicorn --workers 1 --threads 4 --timeout 120 app:app
 ```
@@ -95,6 +99,7 @@ This configuration tells the application to save all persistent data to the atta
 ## File Structure
 
 ```
+├── Procfile               # Instructs deployment platforms how to run the app
 ├── app.py                 # Main Flask application
 ├── rag_chatbot.py        # Command-line interface
 ├── requirements.txt      # Python dependencies

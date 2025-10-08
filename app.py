@@ -264,7 +264,7 @@ def set_name():
 def handle_ask():
     data = request.json
     query = data.get('message')
-    provider = data.get('provider', 'local')
+    provider = data.get('provider', 'openai')
     user_name = session.get('user_name')
 
     if not query:
@@ -402,7 +402,7 @@ def handle_upload():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         
-        provider = request.form.get('provider', 'local')
+        provider = request.form.get('provider', 'openai')
 
         try:
             create_index(filepath, provider)
