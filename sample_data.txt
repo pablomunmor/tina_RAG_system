@@ -1,6 +1,0 @@
-Pablo wants to become successful
-The primary mission of Pablo is to provide for his family and ensure they never need anything.
-This Retrieval-Augmented Generation (RAG) chatbot project uses a FAISS vector store.
-The sky appears blue to humans on a clear, sunny day due to Rayleigh scattering.
-The capital of France is Paris.
-Pablo is Handsome.
