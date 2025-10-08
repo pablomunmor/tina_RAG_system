@@ -998,11 +998,10 @@
             const message = input.value.trim();
             if (!message) return;
 
-            if (!isNameCollected && !userName && isLikelyName(message)) {
+            // If we haven't collected a name yet, the first message is sent to the name handler.
+            if (!isNameCollected) {
                 await handleNameSubmission(message);
-                input.value = '';
-                autoResize(input);
-                handleInputChange(input);
+                // The input is cleared within handleNameSubmission if successful
                 return;
             }
 
@@ -1011,7 +1010,47 @@
             autoResize(input);
             handleInputChange(input);
             showTypingIndicator();
+            await fetchAnswer(message);
+        }
 
+        async function handleNameSubmission(userInput) {
+            addMessage(userInput, 'user');
+            const input = document.getElementById('chatInput');
+            input.value = '';
+            autoResize(input);
+            handleInputChange(input);
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('/set_name', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: userInput })
+                });
+
+                hideTypingIndicator();
+                const data = await response.json();
+
+                if (data.is_name) {
+                    // The backend confirmed it's a name and sent a greeting
+                    userName = userInput;
+                    isNameCollected = true;
+                    addSlowStreamingMessage([data.message], 'bot', false);
+                } else {
+                    // It's not a name, so treat it as the first question.
+                    // We've already added the user message, now we get the answer.
+                    isNameCollected = true; // We stop asking for a name
+                    showTypingIndicator();
+                    await fetchAnswer(userInput);
+                }
+            } catch (error) {
+                hideTypingIndicator();
+                console.error('Error during name submission/initial question:', error);
+                addMessage("I'm having a little trouble at the moment. Please try again.", 'bot');
+            }
+        }
+
+        async function fetchAnswer(message) {
             try {
                 const response = await fetch('/ask', {
                     method: 'POST',
@@ -1034,39 +1073,6 @@
                 hideTypingIndicator();
                 addMessage(`I apologize, but I'm experiencing technical difficulties: ${error.message}. Please try again in a moment.`, 'bot');
                 console.error("Error sending message:", error);
-            }
-        }
-
-        function isLikelyName(text) {
-            const namePattern = /^[A-Za-z][a-z]*$/;
-            const words = text.trim().split(/\s+/);
-            return words.length <= 2 && words.every(word => namePattern.test(word)) && text.length <= 20;
-        }
-
-        async function handleNameSubmission(name) {
-            try {
-                const response = await fetch('/set_name', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: name })
-                });
-
-                const data = await response.json();
-                if (data.success) {
-                    userName = name;
-                    isNameCollected = true;
-                    addMessage(name, 'user');
-                    setTimeout(() => {
-                        addSlowStreamingMessage([
-                            `Lovely to meet you, ${name}! That's such a beautiful name.`,
-                            "Now, how can I support you today? Whether you have questions about pregnancy, newborn care, breastfeeding, or just want to chat about what's on your mind - I'm here for you."
-                        ], 'bot', false);
-                    }, 500);
-                }
-            } catch (error) {
-                console.error('Error setting name:', error);
-                addMessage(name, 'user');
-                showTypingIndicator();
             }
         }
 
