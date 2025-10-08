@@ -76,6 +76,22 @@ When deploying, you will need to provide a start command. Use the following comm
 gunicorn app:app
 ```
 
+### Persistent Storage (for Render, etc.)
+To ensure that your uploaded files and the chatbot's knowledge base (the vector store) are not lost when the server restarts or redeploys, you must use persistent storage.
+
+On a platform like **Render**, follow these steps:
+
+1.  **Add a Disk**: In your service's dashboard, go to the "Disks" section and add a new disk.
+    -   **Name**: `clementina-data` (or any name you prefer)
+    -   **Mount Path**: `/var/data`
+    -   **Size**: 1GB is a good starting point.
+
+2.  **Set the Environment Variable**: Go to the "Environment" section and add the following environment variable:
+    -   **Key**: `STORAGE_DIR`
+    -   **Value**: `/var/data` (this must match the Mount Path from the previous step).
+
+This configuration tells the application to save all persistent data to the attached disk, ensuring Tina's memory is preserved.
+
 ## File Structure
 
 ```

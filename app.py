@@ -21,9 +21,20 @@ load_dotenv()
 HUGGING_FACE_HUB_API_TOKEN = os.getenv('HUGGING_FACE_HUB_API_TOKEN')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
+# Storage configuration for persistent data
+# On platforms like Render, set STORAGE_DIR to a mounted disk path (e.g., /var/data)
+STORAGE_DIR = os.getenv('STORAGE_DIR')
+
+if STORAGE_DIR:
+    # Use persistent storage for uploads and the vector store
+    UPLOAD_FOLDER = os.path.join(STORAGE_DIR, 'uploaded_files')
+    VECTOR_STORE_PATH = os.path.join(STORAGE_DIR, "faiss_index")
+else:
+    # Use local folders for local development
+    UPLOAD_FOLDER = 'uploaded_files'
+    VECTOR_STORE_PATH = "faiss_index"
+
 # Constants
-UPLOAD_FOLDER = 'uploaded_files'
-VECTOR_STORE_PATH = "faiss_index"
 LOGS_FOLDER = 'conversation_logs'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'docx'}
 
@@ -35,6 +46,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Ensure required folders exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(LOGS_FOLDER, exist_ok=True)
+if STORAGE_DIR:
+    os.makedirs(VECTOR_STORE_PATH, exist_ok=True)
 
 # Clementina's Personality Template
 CLEMENTINA_TEMPLATE = """You are Tina (short for Clementina), a compassionate and knowledgeable maternal health assistant. You have the warmth of a trusted midwife combined with evidence-based medical knowledge.
