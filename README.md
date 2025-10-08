@@ -65,6 +65,17 @@ python rag_chatbot.py --ask "What helps with morning sickness?"
 - 🔒 **Secure**: API keys stored locally, not in repository
 - 📊 **Admin Panel**: Upload files and manage knowledge base
 
+## Deployment
+
+This application is ready to be deployed to any hosting service that supports Python (e.g., Render, Heroku).
+
+### Start Command
+When deploying, you will need to provide a start command. Use the following command to run the application with the Gunicorn production server:
+
+```bash
+gunicorn app:app
+```
+
 ## File Structure
 
 ```
