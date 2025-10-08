@@ -64,30 +64,46 @@ if STORAGE_DIR:
     os.makedirs(VECTOR_STORE_PATH, exist_ok=True)
 
 # Clementina's Personality Template
-CLEMENTINA_TEMPLATE = """You are Tina (short for Clementina), a compassionate and knowledgeable maternal health assistant. You have the warmth of a trusted midwife combined with evidence-based medical knowledge.
-
+CLEMENTINA_TEMPLATE = """
+You are Tina (short for Clementina), a compassionate and knowledgeable postpartum and lactation support guide.
 
 Your personality and rules:
-- Be warm, gentle, and encouraging. Use a soft, caring tone.
-- Summarize and explain information in your own words. Do not quote directly from the source material.
-- **CRITICAL RULE: Your main response MUST be under 100 characters.**
-- **CRITICAL RULE: Directly answer the user's question. Do not provide related, but irrelevant information.**
-- If a user's name is provided but it sounds like a health topic (e.g., "Sore Nipples"), gently ignore the name and answer the question directly.
+- Be warm, gentle, and encouraging. Use a calm, caring tone.
+- Speak in your own words, paraphrasing medical information accurately while staying faithful to source material.
+- Always answer the user's exact question first. Do not add unrelated detail.
+- Keep responses concise but complete - typically 1-3 sentences depending on complexity.
+- Never repeat information the user already seems to know.
+- If a user's name is provided, use it naturally but sparingly (once per conversation at most).
 
 Communication style:
-- Keep responses brief and conversational (1-2 sentences maximum).
-- Focus on the most important, practical information first.
-- After answering, if it seems helpful, ask a single, relevant follow-up question. For example, if the user asks about feeding, you could ask, "Would you like some tips on how to tell if the baby is latched on correctly?"
+- Focus on the most important, immediately actionable information.
+- Default to ending with a warm closing or affirmation, NOT a question.
 
-IMPORTANT MEDICAL DISCLAIMER: Always remind users that your guidance is educational and they should consult their healthcare provider for personalized medical advice, especially for urgent concerns.
+**CRITICAL: Only ask a follow-up question if ALL of these are true:**
+1. You have ALREADY fully answered their question, AND
+2. ONE of these conditions applies:
+   • User's intent is unclear (confidence < 0.7) - ask for clarification
+   • Safety concern exists (pain, fever, bleeding, infection, medication) - ask screening question
+   • User explicitly requests more ("tell me more", "what else", "what about")
+
+**DO NOT ask a question if:**
+- You're introducing a new topic (even if related)
+- You're offering additional information they didn't request
+- The answer is complete and the user can come back if needed
+
+Instead of asking "Would you like tips on X?", simply state: "I'm here if you need tips on X too."
+
+IMPORTANT MEDICAL DISCLAIMER:
+Always remind users that your guidance is educational only and not a substitute for professional medical advice. Encourage them to consult healthcare providers for concerns, especially regarding safety issues.
 
 Knowledge Base Context:
 {context}
 
-Question: {question}
+Question:
+{question}
 
-
-Tina's caring response:"""
+Tina's caring response:
+"""
 
 
 def log_conversation(user_message, bot_response, sources, feedback=None, user_name=None):
@@ -234,10 +250,6 @@ Standalone question:"""
     
     answer_parts = [p.strip() for p in answer.split("\n\n") if p.strip()]
 
-    if user_name and not session.get('greeted'):
-        answer_parts[0] = f"Hi {user_name}! {answer_parts[0]}"
-        session['greeted'] = True
-
     return answer_parts, sources
 
 # Flask Routes
@@ -249,15 +261,66 @@ def serve_index():
 @app.route('/set_name', methods=['POST'])
 @auth.login_required
 def set_name():
-    """Store user's name in session."""
+    """Analyzes if the user input is a name and responds appropriately using the LLM."""
     data = request.json
-    name = data.get('name', '').strip()
-    if name:
-        session['user_name'] = name
-        session['greeted'] = False  # Reset greeted flag for new user
-        session['chat_history'] = []  # Start a fresh chat history
-        return jsonify({"success": True, "message": f"Nice to meet you, {name}!"})
-    return jsonify({"success": False, "message": "Please provide a valid name."})
+    user_input = data.get('name', '').strip()
+
+    if not user_input:
+        return jsonify({"is_name": False})
+
+    # If no API key is available, we cannot perform the LLM analysis.
+    # In this case, we'll assume the input is a question and let the frontend proceed.
+    if not OPENAI_API_KEY or "DUMMY" in OPENAI_API_KEY:
+        print("⚠️ Warning: OPENAI_API_KEY not found or is a placeholder. Skipping name analysis.")
+        return jsonify({"is_name": False})
+
+    # A specialized prompt to ask the LLM to analyze the input
+    name_analysis_template = """
+    You are an expert assistant skilled in identifying personal names in conversation.
+    Analyze the user's input to determine if it is a name or a health-related question.
+
+    User Input: "{user_input}"
+
+    Tasks:
+    1.  Determine if the input is a plausible name (e.g., "Maria", "Jen", "David").
+    2.  If it IS a name, respond with a JSON object with "is_name": true and a "message" field containing a warm, friendly, and slightly varied greeting.
+        - Example Greeting: "It's so lovely to meet you, {{name}}! How can I support you today?"
+        - Do not always use the same greeting. Be creative and empathetic.
+    3.  If it is NOT a name (e.g., "sore nipples", "how do I breastfeed", "I'm feeling sad"), respond with a JSON object where "is_name" is false.
+
+    Your response must be a single, valid JSON object and nothing else.
+
+    JSON Response:
+    """
+
+    prompt = PromptTemplate(
+        template=name_analysis_template,
+        input_variables=["user_input"]
+    )
+
+    try:
+        llm, _ = get_llm_and_embeddings('openai')
+        name_chain = prompt | llm
+        response_str = name_chain.invoke({"user_input": user_input})
+
+        if response_str.strip().startswith("```json"):
+            response_str = response_str.strip()[7:-4].strip()
+
+        response_data = json.loads(response_str)
+        is_name = response_data.get("is_name", False)
+
+        if is_name:
+            session['user_name'] = user_input
+            session['greeted'] = True
+            session['chat_history'] = []
+            return jsonify({"is_name": True, "message": response_data.get("message", "")})
+        else:
+            return jsonify({"is_name": False})
+
+    except Exception as e:
+        print(f"Error in name analysis LLM call: {e}. Defaulting to treating input as a question.")
+        # Fallback for safety: if the LLM call fails, assume it's a question.
+        return jsonify({"is_name": False})
 
 @app.route('/ask', methods=['POST'])
 @auth.login_required
